@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ChevronLeft, ChevronRight, Home, Shield, Monitor as MonitorIcon, Send, Bot, User } from "lucide-react"
+import { Send, Bot, User } from "lucide-react"
 import VisaPreview from "@/components/shared/VisaPreview"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
+import Sidebar from "@/components/shared/Sidebar"
+import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
 
 // Message interface for chat functionality
 interface Message {
@@ -126,7 +128,6 @@ const FormattedMessage = ({
 
 export default function NewMonitorPage() {
   const router = useRouter()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState("Monitor")
 
   // Preview mode state
@@ -475,85 +476,22 @@ If this does not meet expectations, feel free to suggest improvements.
   return (
     <div className="flex h-screen bg-background">
       {/* Left Navigation Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out flex flex-col border-r border-border bg-card fixed left-0 top-0 h-full z-30`}>
-        {/* Navigation Header */}
-        <div className="p-4 border-b border-border">
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-            {!sidebarCollapsed && (
-              <h2 className="font-semibold text-foreground">Navigation</h2>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="h-8 w-8 p-0"
-              title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Navigation Items */}
-        <div className="flex-1 p-2">
-          <nav className="space-y-2">
-            <Button
-              variant={activeNavItem === "Sentire" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Sentire")}
-              title={sidebarCollapsed ? "Sentire" : undefined}
-            >
-              <Shield className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Sentire</span>}
-            </Button>
-            <Button
-              variant={activeNavItem === "Monitor" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Monitor")}
-              title={sidebarCollapsed ? "Monitor" : undefined}
-            >
-              <MonitorIcon className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Monitor</span>}
-            </Button>
-          </nav>
-        </div>
-      </div>
+      <Sidebar
+        activeNavItem={activeNavItem}
+        onNavItemChange={setActiveNavItem}
+      />
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 ease-in-out`}>
+      <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <div className="fixed top-0 right-0 z-20 bg-card border-b border-border" style={{ left: sidebarCollapsed ? '64px' : '256px', transition: 'left 300ms ease-in-out' }}>
-          <div className="px-6 py-3">
-            <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 text-muted-foreground hover:text-foreground"
-                onClick={() => router.push("/")}
-              >
-                <Home className="h-4 w-4" />
-              </Button>
-              <span className="text-muted-foreground">/</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto px-2 py-1 text-foreground font-medium hover:bg-muted"
-                onClick={() => router.push("/monitor")}
-              >
-                Monitor
-              </Button>
-              <span className="text-muted-foreground">/</span>
-              <span className="text-foreground font-medium">New Monitor</span>
-            </nav>
-          </div>
-        </div>
+        <Breadcrumb items={BREADCRUMB_CONFIGS.monitorCreate()} />
 
         {/* Main Content - Chat Interface or Split Layout */}
-        <div className="flex-1 flex bg-background h-full pt-[52px]">
+        <div className="flex-1 flex bg-background overflow-hidden">
           {showPreview ? (
             <>
-              {/* Chat Area - 1/4 width */}
-              <div className="w-1/4 flex flex-col border-r border-border h-full">
+              {/* Chat Area - Improved width for better usability with responsive design */}
+              <div className="w-96 min-w-80 max-w-96 lg:min-w-96 flex flex-col border-r border-border h-full">
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   <div className="space-y-4">
@@ -618,10 +556,10 @@ If this does not meet expectations, feel free to suggest improvements.
                 </div>
               </div>
 
-              {/* Preview Area - 3/4 width */}
-              <div className="flex-1 flex flex-col h-full">
-                {previewType === "visa" && <VisaPreview className="flex-1" />}
-                {previewType === "network" && <VisaPreview className="flex-1" />}
+              {/* Preview Area - Remaining width with proper overflow handling */}
+              <div className="flex-1 flex flex-col h-full overflow-hidden">
+                {previewType === "visa" && <VisaPreview className="flex-1 overflow-hidden" />}
+                {previewType === "network" && <VisaPreview className="flex-1 overflow-hidden" />}
               </div>
             </>
           ) : (
