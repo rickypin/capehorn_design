@@ -18,19 +18,19 @@ Removed decorative icons from the Layer 2: Network Transmission Health chart tit
 ### 📝 Technical Details
 
 #### Before:
-```tsx
+\`\`\`tsx
 <CardTitle className="text-lg flex items-center gap-2">
   <Clock className="h-5 w-5 text-blue-600" />
   End-to-End Latency
 </CardTitle>
-```
+\`\`\`
 
 #### After:
-```tsx
+\`\`\`tsx
 <CardTitle className="text-lg">
   End-to-End Latency
 </CardTitle>
-```
+\`\`\`
 
 ## Benefits
 - **Cleaner Design**: Reduced visual clutter in chart headers

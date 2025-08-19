@@ -27,7 +27,7 @@ The original "Overall Status" display used:
 - **Critical**: Red X in red circle
 
 #### 3. **Pure Status Layout**
-```
+\`\`\`
 ┌─────────────────────────────────────┐
 │                                     │
 │            [Large Icon]             │
@@ -36,7 +36,7 @@ The original "Overall Status" display used:
 │          Overall Status             │
 │                                     │
 └─────────────────────────────────────┘
-```
+\`\`\`
 
 #### 4. **Color-Coded Background**
 - **Dynamic Background**: Entire card background changes with status
@@ -53,13 +53,13 @@ The original "Overall Status" display used:
 - **Layout**: Flexbox for optimal alignment and responsiveness
 
 #### Dynamic Styling System
-```typescript
+\`\`\`typescript
 // Color scheme based on health score
 const healthScore = Math.min(nhi, thi);
 const isHealthy = healthScore >= 80;
 const isWarning = healthScore >= 60;
 const isCritical = healthScore < 60;
-```
+\`\`\`
 
 #### Responsive Design
 - **Mobile**: Single column layout

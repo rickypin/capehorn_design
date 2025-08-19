@@ -46,7 +46,7 @@ Successfully implemented a switch button to replace the scenario dropdown in the
 ## Technical Implementation
 
 ### Switch Component Structure
-```tsx
+\`\`\`tsx
 <div className="flex items-center gap-4">
   <div className="flex items-center gap-2">
     <span className="text-sm text-muted-foreground">{t("realData")}</span>
@@ -76,13 +76,13 @@ Successfully implemented a switch button to replace the scenario dropdown in the
     </Select>
   )}
 </div>
-```
+\`\`\`
 
 ### Data Generation Logic
-```tsx
+\`\`\`tsx
 const effectiveScenario = isSimulatedData ? scenario : "normal"
 return genSeries({ minutes, scenario: effectiveScenario, tfmt })
-```
+\`\`\`
 
 ## User Experience
 1. **Default View**: Users see "Real Data | Simulated Data" with switch in OFF position
