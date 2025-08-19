@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   Activity,
   Wifi,
@@ -40,12 +41,24 @@ const DICT = {
   "zh-CN": {
     title: "VISA Service",
     timeRange: "时间窗",
+    // Time range options with "Last" prefix
+    last_5m: "最近 5 分钟",
+    last_15m: "最近 15 分钟",
+    last_1h: "最近 1 小时",
+    last_4h: "最近 4 小时",
     scenario: "场景",
+    realData: "真实数据",
+    simulatedData: "模拟数据",
     scenario_normal: "场景：正常",
     scenario_network: "场景：网络异常",
     scenario_app: "场景：应用异常",
     scenario_crossborder: "场景：跨境路由抖动",
     scenario_retrans: "场景：重传风暴",
+    // Simplified versions without "Scenario:" prefix for dropdown
+    network_incident: "网络异常",
+    app_incident: "应用异常",
+    crossborder_jitter: "跨境路由抖动",
+    retrans_storm: "重传风暴",
     nhi: "NHI 网络影响",
     thi: "THI 交易健康",
     card_latency: "端到端延迟 P50/P95/P99 (ms)",
@@ -81,12 +94,24 @@ const DICT = {
   "en-US": {
     title: "VISA Service Performance Monitor",
     timeRange: "Time Range",
+    // Time range options with "Last" prefix
+    last_5m: "Last 5 min",
+    last_15m: "Last 15 min",
+    last_1h: "Last 1 hour",
+    last_4h: "Last 4 hours",
     scenario: "Scenario",
+    realData: "Real Data",
+    simulatedData: "Simulated Data",
     scenario_normal: "Scenario: Normal",
     scenario_network: "Scenario: Network Incident",
     scenario_app: "Scenario: App/Dependency Incident",
     scenario_crossborder: "Scenario: Cross-border Jitter",
     scenario_retrans: "Scenario: Retransmission Storm",
+    // Simplified versions without "Scenario:" prefix for dropdown
+    network_incident: "Network Incident",
+    app_incident: "App/Dependency Incident",
+    crossborder_jitter: "Cross-border Jitter",
+    retrans_storm: "Retransmission Storm",
     nhi: "Network Health Index",
     thi: "Transaction Health Index",
     card_latency: "End-to-end Latency P50/P95/P99 (ms)",
@@ -314,6 +339,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
   const { locale, setLocale, t, nfmt, tfmt, isClient } = useI18n("en-US")
   const [timeRange, setTimeRange] = useState("15m")
   const [scenario, setScenario] = useState("normal")
+  const [isSimulatedData, setIsSimulatedData] = useState(false)
 
   const minutes = timeRange === "5m" ? 5 : timeRange === "15m" ? 15 : timeRange === "1h" ? 60 : 240
 
@@ -338,8 +364,9 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
         codeTimeout: 0.02,
       }))
     }
-    return genSeries({ minutes, scenario, tfmt })
-  }, [minutes, scenario, tfmt, isClient])
+    const effectiveScenario = isSimulatedData ? scenario : "normal"
+    return genSeries({ minutes, scenario: effectiveScenario, tfmt })
+  }, [minutes, scenario, isSimulatedData, tfmt, isClient])
 
   const windowPoints = data
   const nhi = useMemo(() => calcNHI(windowPoints), [windowPoints])
@@ -357,40 +384,54 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
               <Globe className="h-5 w-5 text-primary" />
               {t("title")}
             </h1>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{t("timeRange")}:</span>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-20 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5m">5m</SelectItem>
-                  <SelectItem value="15m">15m</SelectItem>
-                  <SelectItem value="1h">1h</SelectItem>
-                  <SelectItem value="4h">4h</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{t("scenario")}:</span>
-              <Select value={scenario} onValueChange={setScenario}>
-                <SelectTrigger className="w-40 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">{t("scenario_normal")}</SelectItem>
-                  <SelectItem value="network">{t("scenario_network")}</SelectItem>
-                  <SelectItem value="app">{t("scenario_app")}</SelectItem>
-                  <SelectItem value="crossborder">{t("scenario_crossborder")}</SelectItem>
-                  <SelectItem value="retrans">{t("scenario_retrans")}</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{t("realData")}</span>
+                <Switch
+                  checked={isSimulatedData}
+                  onCheckedChange={(checked) => {
+                    setIsSimulatedData(checked)
+                    if (!checked) {
+                      setScenario("normal")
+                    } else {
+                      // Set default to "network" when switching to simulated data
+                      setScenario("network")
+                    }
+                  }}
+                />
+                <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
+              </div>
+
+              {isSimulatedData && (
+                <Select value={scenario} onValueChange={setScenario}>
+                  <SelectTrigger className="w-48 h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="network">{t("network_incident")}</SelectItem>
+                    <SelectItem value="app">{t("app_incident")}</SelectItem>
+                    <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
+                    <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 
           <div className="ml-auto flex items-center gap-4">
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-32 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5m">{t("last_5m")}</SelectItem>
+                <SelectItem value="15m">{t("last_15m")}</SelectItem>
+                <SelectItem value="1h">{t("last_1h")}</SelectItem>
+                <SelectItem value="4h">{t("last_4h")}</SelectItem>
+              </SelectContent>
+            </Select>
+
             {badge && (
               <Badge
                 variant={badge.color === "red" ? "destructive" : badge.color === "orange" ? "secondary" : "default"}
