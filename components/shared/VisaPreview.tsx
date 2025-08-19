@@ -79,7 +79,7 @@ const DICT = {
     badge_normal: "正常",
   },
   "en-US": {
-    title: "VISA Service",
+    title: "VISA Service Performance Monitor",
     timeRange: "Time Range",
     scenario: "Scenario",
     scenario_normal: "Scenario: Normal",
@@ -87,8 +87,8 @@ const DICT = {
     scenario_app: "Scenario: App/Dependency Incident",
     scenario_crossborder: "Scenario: Cross-border Jitter",
     scenario_retrans: "Scenario: Retransmission Storm",
-    nhi: "NHI Network Impact",
-    thi: "THI Transaction Health",
+    nhi: "Network Health Index",
+    thi: "Transaction Health Index",
     card_latency: "End-to-end Latency P50/P95/P99 (ms)",
     filterable: "Filterable",
     card_loss_retrans: "Packet Loss / TCP Retransmission (%)",
@@ -409,283 +409,382 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
       {/* Dashboard Content */}
       <div className="flex-1 p-6 overflow-y-auto">
-        <div className="space-y-4">
-          {/* Health Indices Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" />
-                  {t("nhi")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-foreground">
+        <div className="space-y-6">
+          {/* Executive Summary - Health Overview */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+            <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">VISA Service Health Overview</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Overall Status */}
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">
+                  {Math.min(nhi, thi) >= 80 ? "🟢" : Math.min(nhi, thi) >= 60 ? "🟡" : "🔴"}
+                </div>
+                <div className="text-lg font-semibold text-foreground">
+                  {Math.min(nhi, thi) >= 80 ? "Healthy" : Math.min(nhi, thi) >= 60 ? "Warning" : "Critical"}
+                </div>
+                <div className="text-sm text-muted-foreground">Overall Status</div>
+              </div>
+
+              {/* Network Health */}
+              <Card className="border-2 border-blue-200 dark:border-blue-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Wifi className="h-5 w-5 text-blue-600" />
+                      <span className="font-medium">Network Health</span>
+                    </div>
+                    <span className="text-2xl font-bold text-foreground">
                       {nfmt(nhi, { maximumFractionDigits: 0 })}
                     </span>
-                    <span className={`text-sm font-medium px-2 py-1 rounded ${
-                      healthColor(nhi) === "green" ? "bg-emerald-100 text-emerald-700" :
-                      healthColor(nhi) === "orange" ? "bg-amber-100 text-amber-700" :
-                      "bg-red-100 text-red-700"
-                    }`}>
-                      {healthColor(nhi) === "green" ? "Healthy" :
-                       healthColor(nhi) === "orange" ? "Warning" : "Critical"}
-                    </span>
                   </div>
-                  <Progress value={nhi} className="h-3" />
-                  <p className="text-sm text-muted-foreground">
-                    Network Health Index based on latency, packet loss, and retransmission metrics
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  <Progress value={nhi} className="h-2 mb-2" />
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${
+                    healthColor(nhi) === "green" ? "bg-emerald-100 text-emerald-700" :
+                    healthColor(nhi) === "orange" ? "bg-amber-100 text-amber-700" :
+                    "bg-red-100 text-red-700"
+                  }`}>
+                    {healthColor(nhi) === "green" ? "Healthy" :
+                     healthColor(nhi) === "orange" ? "Warning" : "Critical"}
+                  </span>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  {t("thi")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-foreground">
+              {/* Transaction Health */}
+              <Card className="border-2 border-green-200 dark:border-green-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      <span className="font-medium">Transaction Health</span>
+                    </div>
+                    <span className="text-2xl font-bold text-foreground">
                       {nfmt(thi, { maximumFractionDigits: 0 })}
                     </span>
-                    <span className={`text-sm font-medium px-2 py-1 rounded ${
-                      healthColor(thi) === "green" ? "bg-emerald-100 text-emerald-700" :
-                      healthColor(thi) === "orange" ? "bg-amber-100 text-amber-700" :
-                      "bg-red-100 text-red-700"
-                    }`}>
-                      {healthColor(thi) === "green" ? "Healthy" :
-                       healthColor(thi) === "orange" ? "Warning" : "Critical"}
-                    </span>
                   </div>
-                  <Progress value={thi} className="h-3" />
-                  <p className="text-sm text-muted-foreground">
-                    Transaction Health Index based on success rate, response time, and error rate
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  <Progress value={thi} className="h-2 mb-2" />
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${
+                    healthColor(thi) === "green" ? "bg-emerald-100 text-emerald-700" :
+                    healthColor(thi) === "orange" ? "bg-amber-100 text-amber-700" :
+                    "bg-red-100 text-red-700"
+                  }`}>
+                    {healthColor(thi) === "green" ? "Healthy" :
+                     healthColor(thi) === "orange" ? "Warning" : "Critical"}
+                  </span>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Network Health Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  {t("card_latency")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-56">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <ComposedChart data={windowPoints} syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" interval="preserveStartEnd"/>
-                        <YAxis yAxisId="left" orientation="left" />
-                        <Tooltip />
-                        <Line yAxisId="left" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} strokeWidth={2} />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
+          {/* Layer 1: Transaction Processing Health */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+            <h2 className="text-xl font-semibold mb-4 text-green-900 dark:text-green-100 flex items-center gap-2">
+              <BarChart3 className="h-6 w-6" />
+              Layer 1: Transaction Processing Health
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Transaction KPIs */}
+              <Card className="border-green-200 dark:border-green-700">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    Core Transaction Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{nfmt(kpi?.req || 0)}</div>
+                      <div className="text-sm text-muted-foreground">Requests/sec</div>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{kpi?.successRate.toFixed(2) || "0.00"}%</div>
+                      <div className="text-sm text-muted-foreground">Success Rate</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{kpi?.respP95.toFixed(0) || "0"}ms</div>
+                      <div className="text-sm text-muted-foreground">Response P95</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-foreground">{kpi?.errorRate.toFixed(2) || "0.00"}%</div>
+                      <div className="text-sm text-muted-foreground">Error Rate</div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    💡 High request count + low success rate → service issue (logic/dependency)
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <XCircle className="h-5 w-5 text-primary" />
-                  {t("card_loss_retrans")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-56">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <ComposedChart data={windowPoints} syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" interval="preserveStartEnd"/>
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Line yAxisId="left" type="monotone" dataKey="loss" stroke="#f59e0b" name="Loss %" dot={false} />
-                        <Line yAxisId="right" type="monotone" dataKey="retrans" stroke="#ef4444" name="Retrans %" dot={false} />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Wifi className="h-5 w-5 text-primary" />
-                  {t("card_bitrate_conn")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-56">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <ComposedChart data={windowPoints} syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" interval="preserveStartEnd"/>
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Area yAxisId="left" type="monotone" dataKey="inMbps" stackId="1" name="Ingress Mbps" fill="#bfdbfe" stroke="#60a5fa" />
-                        <Area yAxisId="left" type="monotone" dataKey="outMbps" stackId="1" name="Egress Mbps" fill="#c7d2fe" stroke="#818cf8" />
-                        <Line yAxisId="right" type="monotone" dataKey="conn" name="Concurrent" stroke="#10b981" dot={false} />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+              {/* Response Code Distribution */}
+              <Card className="border-green-200 dark:border-green-700">
+                <CardHeader>
+                  <CardTitle className="text-lg">Response Code Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <BarChart data={windowPoints.slice(-10)} syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" interval="preserveStartEnd"/>
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="codeSuccess" stackId="codes" name={t("success")} fill="#10b981" />
+                          <Bar dataKey="code4xx" stackId="codes" name={t("fourxx")} fill="#f59e0b" />
+                          <Bar dataKey="code5xx" stackId="codes" name={t("fivexx")} fill="#ef4444" />
+                          <Bar dataKey="codeTimeout" stackId="codes" name={t("timeout")} fill="#6366f1" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 Many 5xx errors + response time surge → VISA system slowdown
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Transaction Validation Section */}
+          {/* Layer 2: Network Transmission Health */}
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+            <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100 flex items-center gap-2">
+              <Wifi className="h-6 w-6" />
+              Layer 2: Network Transmission Health
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <Card className="border-blue-200 dark:border-blue-700">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-blue-600" />
+                    End-to-End Latency
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <ComposedChart data={windowPoints} syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" interval="preserveStartEnd"/>
+                          <YAxis yAxisId="left" orientation="left" />
+                          <Tooltip />
+                          <Line yAxisId="left" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} strokeWidth={2} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 Normal average but high P99 → some transactions timing out
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-200 dark:border-blue-700">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <XCircle className="h-5 w-5 text-blue-600" />
+                    Packet Loss & Retransmission
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <ComposedChart data={windowPoints} syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" interval="preserveStartEnd"/>
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                          <Tooltip />
+                          <Line yAxisId="left" type="monotone" dataKey="loss" stroke="#f59e0b" name="Loss %" dot={false} />
+                          <Line yAxisId="right" type="monotone" dataKey="retrans" stroke="#ef4444" name="Retrans %" dot={false} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 High packet loss/retransmission + transaction failure → network issue
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-200 dark:border-blue-700">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-blue-600" />
+                    Traffic & Connections
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <ComposedChart data={windowPoints} syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" interval="preserveStartEnd"/>
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                          <Tooltip />
+                          <Area yAxisId="left" type="monotone" dataKey="inMbps" stackId="1" name="Ingress Mbps" fill="#bfdbfe" stroke="#60a5fa" />
+                          <Area yAxisId="left" type="monotone" dataKey="outMbps" stackId="1" name="Egress Mbps" fill="#c7d2fe" stroke="#818cf8" />
+                          <Line yAxisId="right" type="monotone" dataKey="conn" name="Concurrent" stroke="#10b981" dot={false} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 Connection spike but transactions drop → possible traffic surge or DDoS
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Layer 3: Cross-Layer Correlation Diagnostics */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
+            <h2 className="text-xl font-semibold mb-4 text-purple-900 dark:text-purple-100 flex items-center gap-2">
+              <Activity className="h-6 w-6" />
+              Layer 3: Cross-Layer Correlation Diagnostics
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Success Rate vs Network Latency */}
+              <Card className="border-purple-200 dark:border-purple-700">
+                <CardHeader>
+                  <CardTitle className="text-lg">Success Rate vs Network Latency</CardTitle>
+                  <div className="text-sm text-muted-foreground">
+                    Dual-axis correlation to identify root cause
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-56">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <ComposedChart data={windowPoints} syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" interval="preserveStartEnd"/>
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                          <Tooltip />
+                          <Line yAxisId="left" type="monotone" dataKey="successRate" stroke="#10b981" name="Success %" dot={false} strokeWidth={2} />
+                          <Line yAxisId="right" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} strokeWidth={2} />
+                          <ReferenceLine yAxisId="left" y={99.5} stroke="#0ea5e9" strokeDasharray="4 4" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 Success rate drops + latency rises → network bottleneck<br/>
+                    💡 Success rate drops + latency normal → VISA internal issue
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Packet Loss vs Response Time Bubble Chart */}
+              <Card className="border-purple-200 dark:border-purple-700">
+                <CardHeader>
+                  <CardTitle className="text-lg">Packet Loss vs Response Time</CardTitle>
+                  <div className="text-sm text-muted-foreground">
+                    Bubble size represents retransmission rate
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-56">
+                    {isClient ? (
+                      <ResponsiveContainer>
+                        <ScatterChart syncId="main">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" dataKey="loss" name="Loss %" domain={[0, 'dataMax + 0.5']} />
+                          <YAxis type="number" dataKey="respP95" name="P95 (ms)" />
+                          <ZAxis type="number" dataKey="retrans" range={[60, 200]} name="Retrans % (bubble)" />
+                          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+                          <Scatter name="Correlation Points" data={windowPoints} fill="#ef4444" />
+                        </ScatterChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-muted-foreground">Loading chart...</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    💡 Large bubbles in upper right → network congestion causing both packet loss and delays
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Diagnosis Panel */}
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950/20">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">🔴 Network Issue Pattern</h3>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    • Transaction failure rate ↑<br/>
+                    • Packet loss/retransmission ↑<br/>
+                    • Network latency ↑<br/>
+                    → Check network infrastructure
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-200 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/20">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">🟡 Application Issue Pattern</h3>
+                  <div className="text-sm text-orange-700 dark:text-orange-300">
+                    • Transaction failure rate ↑<br/>
+                    • Network metrics normal<br/>
+                    • Many 5xx errors<br/>
+                    → Check VISA application layer
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/20">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">🔵 Cross-border Issue Pattern</h3>
+                  <div className="text-sm text-blue-700 dark:text-blue-300">
+                    • Transaction volume drops<br/>
+                    • Packet loss rises<br/>
+                    • Latency oscillates<br/>
+                    → Check external routing
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Response Time Distribution by Code */}
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-primary" />
-                  {t("kpi_title")}
+                  Response Time Distribution by Return Code
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">{t("req")}</div>
-                    <div className="text-2xl font-semibold">{nfmt(kpi?.req || 0)}</div>
-                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">{t("succRate")}</div>
-                    <div className="text-2xl font-semibold">{kpi?.successRate.toFixed(2) || "0.00"}</div>
-                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">{t("respP95")}</div>
-                    <div className="text-2xl font-semibold">{kpi?.respP95.toFixed(0) || "0"}</div>
-                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">{t("errRate")}</div>
-                    <div className="text-2xl font-semibold">{kpi?.errorRate.toFixed(2) || "0.00"}</div>
-                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
-                  </div>
+                <div className="text-sm text-muted-foreground">
+                  Weighted average response times help identify which error types cause delays
                 </div>
-
-                <div className="h-56 mt-4">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <BarChart data={windowPoints} syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" interval="preserveStartEnd"/>
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="codeSuccess" stackId="codes" name={t("success")} fill="#10b981" />
-                        <Bar dataKey="code4xx" stackId="codes" name={t("fourxx")} fill="#f59e0b" />
-                        <Bar dataKey="code5xx" stackId="codes" name={t("fivexx")} fill="#ef4444" />
-                        <Bar dataKey="codeTimeout" stackId="codes" name={t("timeout")} fill="#6366f1" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Correlation Diagnostics Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("corr_title_1")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-56">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <ComposedChart data={windowPoints} syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" interval="preserveStartEnd"/>
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Line yAxisId="left" type="monotone" dataKey="successRate" stroke="#10b981" name="Success %" dot={false} />
-                        <Line yAxisId="right" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} />
-                        <ReferenceLine yAxisId="left" y={99.5} stroke="#0ea5e9" strokeDasharray="4 4" />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground mt-2">{t("corr_read_1")}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("corr_title_2")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-56">
-                  {isClient ? (
-                    <ResponsiveContainer>
-                      <ScatterChart syncId="main">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" dataKey="loss" name="Loss %" domain={[0, 'dataMax + 0.5']} />
-                        <YAxis type="number" dataKey="respP95" name="P95 (ms)" />
-                        <ZAxis type="number" dataKey="retrans" range={[60, 200]} name="Retrans % (bubble)" />
-                        <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-                        <Scatter name="t" data={windowPoints} fill="#ef4444" />
-                      </ScatterChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-muted-foreground">Loading chart...</div>
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground mt-2">{t("corr_read_2")}</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("bar_title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-56">
@@ -695,12 +794,13 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                         { name: t("success"), avg: avg(windowPoints, 'respP95', 'codeSuccess') },
                         { name: t("fourxx"), avg: avg(windowPoints, 'respP95', 'code4xx') },
                         { name: t("fivexx"), avg: avg(windowPoints, 'respP95', 'code5xx') },
+                        { name: t("timeout"), avg: avg(windowPoints, 'respP95', 'codeTimeout') },
                       ]}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="avg" name={t("weighted_avg")} fill="#6366f1" />
+                        <Bar dataKey="avg" name="Weighted Average Response Time (ms)" fill="#6366f1" />
                       </ComposedChart>
                     </ResponsiveContainer>
                   ) : (
@@ -709,7 +809,9 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground mt-2">{t("footer")}</div>
+                <div className="text-xs text-muted-foreground mt-2">
+                  💡 High timeout response times indicate network timeouts vs application processing delays
+                </div>
               </CardContent>
             </Card>
           </div>

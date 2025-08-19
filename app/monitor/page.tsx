@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   MonitorIcon,
   Home,
@@ -13,6 +13,7 @@ import {
   Shield,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 
 export default function MonitorListPage() {
   const router = useRouter()
@@ -20,13 +21,17 @@ export default function MonitorListPage() {
   const [activeNavItem, setActiveNavItem] = useState("Monitor")
 
   // Sample monitor data - in a real app this would come from an API
-  const monitors = [
+  const monitors: MonitorCardData[] = [
     {
       id: "1",
       name: "VISA Service",
       status: "active",
       lastUpdated: "2 minutes ago",
       route: "visa_service",
+      type: "network",
+      showMetrics: true,
+      iconColor: "blue",
+      statusColor: "green",
     },
     {
       id: "2",
@@ -34,6 +39,10 @@ export default function MonitorListPage() {
       status: "active",
       lastUpdated: "5 minutes ago",
       route: "visa_service_intermediate",
+      type: "transaction",
+      showMetrics: true,
+      iconColor: "orange",
+      statusColor: "green",
     },
   ]
 
@@ -42,10 +51,9 @@ export default function MonitorListPage() {
     router.push("/monitor/create")
   }
 
-  const handleMonitorClick = (monitorId: string) => {
-    // Find the monitor and navigate to its route
-    const monitor = monitors.find(m => m.id === monitorId)
-    if (monitor) {
+  const handleMonitorClick = (monitor: MonitorCardData) => {
+    // Navigate to the monitor's route
+    if (monitor.route) {
       router.push(`/monitor/${monitor.route}`)
     }
   }
@@ -139,27 +147,11 @@ export default function MonitorListPage() {
 
               {/* Existing Monitor Cards */}
               {monitors.map((monitor) => (
-                <Card 
+                <MonitorCard
                   key={monitor.id}
-                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
-                  onClick={() => handleMonitorClick(monitor.id)}
-                >
-                  <CardContent className="flex flex-col h-48 p-6">
-                    <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <MonitorIcon className="h-8 w-8 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground mb-2">{monitor.name}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span className="text-sm text-muted-foreground capitalize">{monitor.status}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Updated {monitor.lastUpdated}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                  monitor={monitor}
+                  onClick={handleMonitorClick}
+                />
               ))}
             </div>
           </div>

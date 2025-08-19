@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ChevronLeft, ChevronRight, Home, Shield, Monitor as MonitorIcon, Send, Bot, User } from "lucide-react"
 import VisaPreview from "@/components/shared/VisaPreview"
+import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 
 // Message interface for chat functionality
 interface Message {
@@ -21,11 +22,15 @@ interface Message {
 const FormattedMessage = ({
   content,
   isUser,
-  onCardClick
+  onCardClick,
+  visaServiceMonitor,
+  networkPriorityMonitor
 }: {
   content: string;
   isUser: boolean;
-  onCardClick?: (type: string) => void;
+  onCardClick?: (monitor: MonitorCardData) => void;
+  visaServiceMonitor: MonitorCardData;
+  networkPriorityMonitor: MonitorCardData;
 }) => {
   // Split content by lines and format accordingly
   const lines = content.split('\n')
@@ -95,52 +100,24 @@ const FormattedMessage = ({
       {/* Add card placeholder for VISA response */}
       {isVisaResponse && (
         <div className="mt-6">
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 max-w-xs"
-            onClick={() => onCardClick?.("visa")}
-          >
-            <CardContent className="flex flex-col h-48 p-6">
-              <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <MonitorIcon className="h-8 w-8 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-foreground mb-2">VISA Service Monitor</h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <span className="text-sm text-muted-foreground">Preview</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Three-layer monitoring dashboard
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <MonitorCard
+            monitor={visaServiceMonitor}
+            onClick={onCardClick}
+            className="max-w-xs"
+            showPreview={true}
+          />
         </div>
       )}
 
       {/* Add card placeholder for Network Admin response */}
       {isNetworkAdminResponse && (
         <div className="mt-6">
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 max-w-xs"
-            onClick={() => onCardClick?.("network")}
-          >
-            <CardContent className="flex flex-col h-48 p-6">
-              <div className="w-16 h-16 rounded-lg bg-orange-500/10 flex items-center justify-center mb-4">
-                <MonitorIcon className="h-8 w-8 text-orange-500" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-foreground mb-2">Network-Priority Monitor</h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                  <span className="text-sm text-muted-foreground">Preview</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Network-first monitoring dashboard
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <MonitorCard
+            monitor={networkPriorityMonitor}
+            onClick={onCardClick}
+            className="max-w-xs"
+            showPreview={true}
+          />
         </div>
       )}
     </div>
@@ -167,6 +144,31 @@ export default function NewMonitorPage() {
   ])
   const [inputValue, setInputValue] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Monitor card data definitions
+  const visaServiceMonitor: MonitorCardData = {
+    id: "visa-service",
+    name: "VISA Service Monitor",
+    status: "preview",
+    description: "Network-focused monitoring",
+    iconColor: "blue",
+    statusColor: "blue",
+    route: "visa_service",
+    type: "network",
+    showMetrics: true, // Show enhanced version to match Monitor page
+  }
+
+  const networkPriorityMonitor: MonitorCardData = {
+    id: "network-priority",
+    name: "Network-Priority Monitor",
+    status: "preview",
+    description: "Transaction-focused monitoring",
+    iconColor: "orange",
+    statusColor: "orange",
+    route: "visa_service_intermediate",
+    type: "transaction",
+    showMetrics: true, // Show enhanced version to match Monitor page
+  }
 
   // Suggestion chips for different monitor types
   const suggestionChips = [
@@ -254,9 +256,9 @@ export default function NewMonitorPage() {
   }
 
   // Handle mini card click to show preview
-  const handleCardClick = (type: string) => {
+  const handleCardClick = (monitor: MonitorCardData) => {
     setShowPreview(true)
-    setPreviewType(type)
+    setPreviewType(monitor.id === "visa-service" ? "visa" : "network")
   }
 
   // Handle suggestion chip click
@@ -547,7 +549,7 @@ If this does not meet expectations, feel free to suggest improvements.
         </div>
 
         {/* Main Content - Chat Interface or Split Layout */}
-        <div className={`flex-1 flex bg-background h-full ${showPreview ? 'pt-0' : 'pt-[52px]'}`}>
+        <div className="flex-1 flex bg-background h-full pt-[52px]">
           {showPreview ? (
             <>
               {/* Chat Area - 1/4 width */}
@@ -578,6 +580,8 @@ If this does not meet expectations, feel free to suggest improvements.
                                 content={message.content}
                                 isUser={message.sender === "user"}
                                 onCardClick={handleCardClick}
+                                visaServiceMonitor={visaServiceMonitor}
+                                networkPriorityMonitor={networkPriorityMonitor}
                               />
                             </CardContent>
                           </Card>
@@ -650,6 +654,8 @@ If this does not meet expectations, feel free to suggest improvements.
                           content={message.content}
                           isUser={message.sender === "user"}
                           onCardClick={handleCardClick}
+                          visaServiceMonitor={visaServiceMonitor}
+                          networkPriorityMonitor={networkPriorityMonitor}
                         />
                       </CardContent>
                     </Card>
