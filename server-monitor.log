@@ -1,0 +1,14 @@
+=== 增强型开发服务器监控 ===
+开始时间: Tue Aug 19 07:23:40 CST 2025
+监控PID: 35061
+==============================
+=== 检查 #1 ===
+[2025-08-19 07:23:40] ✅ 端口3000正在监听
+[2025-08-19 07:23:40] 📊 进程PID: 5091
+34787
+[2025-08-19 07:23:40] 💾 内存使用:
+  PID  PPID    RSS      VSZ  %CPU %MEM COMM
+ 5091  5083  52768 444506864   0.1  0.3 /Applications/Dia.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper.app/Contents/MacOS/Browser Helper
+34787 34786 781472 458355248   0.0  4.7 next-server (v15.2.4)
+[2025-08-19 07:23:40] 🌐 HTTP响应正常
+等待30秒...

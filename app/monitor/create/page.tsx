@@ -1,43 +1,14 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  MonitorIcon,
-  Home,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-} from "lucide-react"
 import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Home, Shield, Monitor as MonitorIcon } from "lucide-react"
 
-export default function MonitorListPage() {
+export default function NewMonitorPage() {
   const router = useRouter()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState("Monitor")
-
-  // Sample monitor data - in a real app this would come from an API
-  const monitors = [
-    {
-      id: "1",
-      name: "VISA Service",
-      status: "active",
-      lastUpdated: "2 minutes ago",
-    },
-  ]
-
-  const handleCreateNew = () => {
-    // Navigate to the new monitor creation page
-    router.push("/monitor/create")
-  }
-
-  const handleMonitorClick = (monitorId: string) => {
-    // Navigate to the VISA Service page
-    router.push("/monitor/visa_service")
-  }
 
   return (
     <div className="flex h-screen bg-background">
@@ -101,55 +72,68 @@ export default function MonitorListPage() {
                 <Home className="h-4 w-4" />
               </Button>
               <span className="text-muted-foreground">/</span>
-              <span className="text-foreground font-medium">Monitor</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto px-2 py-1 text-foreground font-medium hover:bg-muted"
+                onClick={() => router.push("/monitor")}
+              >
+                Monitor
+              </Button>
+              <span className="text-muted-foreground">/</span>
+              <span className="text-foreground font-medium">New Monitor</span>
             </nav>
           </div>
         </div>
 
-        {/* Page Content */}
-        <div className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
+        {/* Content Area Below Breadcrumb */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Content Area - Same structure as VISA monitor but empty */}
+          <div className="w-72 flex flex-col border-r border-border bg-sidebar">
+            {/* Header placeholder - maintaining structure */}
+            <div className="p-4 border-b border-sidebar-border bg-card">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <MonitorIcon className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <h1 className="font-semibold text-sidebar-foreground">New Monitor</h1>
+                  <p className="text-sm text-muted-foreground">Setup Dashboard</p>
+                </div>
+              </div>
+            </div>
 
+            {/* Content area - keeping structure but empty */}
+            <div className="flex-1 p-4">
+              <div className="text-center text-muted-foreground">
+                <p className="text-sm">Configure your new monitor settings here</p>
+              </div>
+            </div>
+          </div>
 
-            {/* Monitor Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {/* New Monitor Card */}
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-dashed border-2 border-muted-foreground/30 hover:border-primary/50"
-                onClick={handleCreateNew}
-              >
-                <CardContent className="flex flex-col items-center justify-center h-48 p-6">
-                  <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center mb-4">
-                    <Plus className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="font-medium text-foreground text-center">Create New Monitor</h3>
-                </CardContent>
-              </Card>
+          {/* Main Dashboard Area - Empty but maintaining structure */}
+          <div className="flex-1 bg-background flex flex-col">
+            {/* Dashboard Header - maintaining structure */}
+            <div className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border">
+              <div className="px-6 py-3 flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-lg flex items-center gap-2">
+                    <MonitorIcon className="h-6 w-6 text-primary" />
+                    New Monitor Dashboard
+                  </span>
+                </div>
+              </div>
+            </div>
 
-              {/* Existing Monitor Cards */}
-              {monitors.map((monitor) => (
-                <Card 
-                  key={monitor.id}
-                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
-                  onClick={() => handleMonitorClick(monitor.id)}
-                >
-                  <CardContent className="flex flex-col h-48 p-6">
-                    <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <MonitorIcon className="h-8 w-8 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground mb-2">{monitor.name}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span className="text-sm text-muted-foreground capitalize">{monitor.status}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Updated {monitor.lastUpdated}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            {/* Empty Dashboard Content Area */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <MonitorIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
+                  <h3 className="text-lg font-medium mb-2">Dashboard Area</h3>
+                  <p className="text-sm">This area will contain your monitor dashboard once configured</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
