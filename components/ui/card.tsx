@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+function Card({ className, ...props }: React.ComponentProps<"div"> & { 'data-clickable'?: string | boolean }) {
   const isClickable = props.onClick || props['data-clickable'] === 'true' || props['data-clickable'] === true
 
   return (
