@@ -101,7 +101,7 @@ export default function MonitorCard({
   if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
     return (
       <Card
-        className={`cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
+        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
         onClick={handleClick}
       >
         <CardContent className="flex flex-col h-64 p-4">
@@ -111,7 +111,7 @@ export default function MonitorCard({
               <MonitorIcon className="h-5 w-5" />
             </div>
             <div className={`px-3 py-1.5 rounded-full border text-xs font-semibold ${healthIndicator.bgColor} ${healthIndicator.color} shadow-sm`}>
-              {healthIndicator.label}: {healthIndicator.value}
+              {healthIndicator.label}: {healthIndicator.value.toFixed(2)}
             </div>
           </div>
 
@@ -200,7 +200,7 @@ export default function MonitorCard({
   // Fallback to simple card
   return (
     <Card
-      className={`cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
+      className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
       onClick={handleClick}
     >
       <CardContent className="flex flex-col h-48 p-6">

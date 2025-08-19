@@ -232,20 +232,20 @@ function genSeries({ minutes, scenario, tfmt }: { minutes: number; scenario: str
     data.push({
       ts,
       time,
-      rtt: Math.max(10, baseRtt + baseRtt * noise()),
-      loss: Math.max(0, baseLoss + baseLoss * noise()),
-      retrans: Math.max(0, baseRetrans + baseRetrans * noise()),
-      conn: Math.max(100, baseConn + baseConn * noise()),
-      inMbps: Math.max(10, baseInMbps + baseInMbps * noise()),
-      outMbps: Math.max(10, baseOutMbps + baseOutMbps * noise()),
-      req: Math.max(50, baseReq + baseReq * noise()),
-      successRate: Math.min(100, Math.max(0, baseSuccessRate + baseSuccessRate * noise() * 0.1)),
-      respP95: Math.max(50, baseRespP95 + baseRespP95 * noise()),
-      errorRate: Math.max(0, baseErrorRate + baseErrorRate * noise()),
-      codeSuccess: Math.max(0, 100 - baseErrorRate - 0.1),
-      code4xx: Math.max(0, 0.1 + Math.random() * 0.1),
-      code5xx: Math.max(0, baseErrorRate * 0.7),
-      codeTimeout: Math.max(0, baseErrorRate * 0.3),
+      rtt: +Math.max(10, baseRtt + baseRtt * noise()).toFixed(2),
+      loss: +Math.max(0, baseLoss + baseLoss * noise()).toFixed(2),
+      retrans: +Math.max(0, baseRetrans + baseRetrans * noise()).toFixed(2),
+      conn: Math.round(Math.max(100, baseConn + baseConn * noise())),
+      inMbps: +Math.max(10, baseInMbps + baseInMbps * noise()).toFixed(2),
+      outMbps: +Math.max(10, baseOutMbps + baseOutMbps * noise()).toFixed(2),
+      req: Math.round(Math.max(50, baseReq + baseReq * noise())),
+      successRate: +Math.min(100, Math.max(0, baseSuccessRate + baseSuccessRate * noise() * 0.1)).toFixed(2),
+      respP95: +Math.max(50, baseRespP95 + baseRespP95 * noise()).toFixed(2),
+      errorRate: +Math.max(0, baseErrorRate + baseErrorRate * noise()).toFixed(2),
+      codeSuccess: +Math.max(0, 100 - baseErrorRate - 0.1).toFixed(2),
+      code4xx: +(0.1 + Math.random() * 0.1).toFixed(2),
+      code5xx: +(baseErrorRate * 0.7).toFixed(2),
+      codeTimeout: +(baseErrorRate * 0.3).toFixed(2),
     })
   }
 
@@ -262,7 +262,7 @@ function calcNHI(points: any[]) {
   const lossScore = Math.max(0, 100 - avgLoss * 20)
   const retransScore = Math.max(0, 100 - avgRetrans * 10)
 
-  return Math.round((rttScore + lossScore + retransScore) / 3)
+  return +((rttScore + lossScore + retransScore) / 3).toFixed(2)
 }
 
 function calcTHI(points: any[]) {
@@ -275,7 +275,7 @@ function calcTHI(points: any[]) {
   const respScore = Math.max(0, 100 - (avgRespP95 - 200) * 0.1)
   const errorScore = Math.max(0, 100 - avgErrorRate * 10)
 
-  return Math.round((successScore + respScore + errorScore) / 3)
+  return +((successScore + respScore + errorScore) / 3).toFixed(2)
 }
 
 function healthColor(value: number) {
@@ -326,18 +326,36 @@ function avg(points: any[], valueKey: string, weightKey: string) {
     wsum += w
     vsum += p[valueKey] * w
   }
-  return +(vsum / wsum).toFixed(1)
+  return +(vsum / wsum).toFixed(2)
 }
 
 interface VisaPreviewProps {
   className?: string
+  hideHeader?: boolean
+  timeRange?: string
+  isSimulatedData?: boolean
+  scenario?: string
 }
 
-export default function VisaPreview({ className = "" }: VisaPreviewProps) {
+export default function VisaPreview({
+  className = "",
+  hideHeader = false,
+  timeRange: externalTimeRange,
+  isSimulatedData: externalIsSimulatedData,
+  scenario: externalScenario
+}: VisaPreviewProps) {
   const { locale, setLocale, t, nfmt, tfmt, isClient } = useI18n("en-US")
-  const [timeRange, setTimeRange] = useState("15m")
-  const [scenario, setScenario] = useState("normal")
-  const [isSimulatedData, setIsSimulatedData] = useState(false)
+  const [internalTimeRange, setInternalTimeRange] = useState("15m")
+  const [internalScenario, setInternalScenario] = useState("normal")
+  const [internalIsSimulatedData, setInternalIsSimulatedData] = useState(false)
+
+  // Use external props if provided, otherwise use internal state
+  const timeRange = externalTimeRange ?? internalTimeRange
+  const scenario = externalScenario ?? internalScenario
+  const isSimulatedData = externalIsSimulatedData ?? internalIsSimulatedData
+  const setTimeRange = externalTimeRange ? () => {} : setInternalTimeRange
+  const setScenario = externalScenario ? () => {} : setInternalScenario
+  const setIsSimulatedData = externalIsSimulatedData !== undefined ? () => {} : setInternalIsSimulatedData
 
   const minutes = timeRange === "5m" ? 5 : timeRange === "15m" ? 15 : timeRange === "1h" ? 60 : 240
 
@@ -374,80 +392,84 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
   return (
     <div className={`flex flex-col h-full bg-background ${className}`}>
-      {/* Header Controls */}
-      <div className="p-4 border-b border-border bg-card">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
-              <Globe className="h-5 w-5 text-primary" />
-              {t("title")}
-            </h1>
+      {!hideHeader && (
+        <>
+          {/* Header Controls */}
+          <div className="sticky top-0 z-10 p-4 border-b border-border bg-card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-primary" />
+                  {t("title")}
+                </h1>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{t("realData")}</span>
-                <Switch
-                  checked={isSimulatedData}
-                  onCheckedChange={(checked) => {
-                    setIsSimulatedData(checked)
-                    if (!checked) {
-                      setScenario("normal")
-                    } else {
-                      // Set default to "network" when switching to simulated data
-                      setScenario("network")
-                    }
-                  }}
-                />
-                <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{t("realData")}</span>
+                    <Switch
+                      checked={isSimulatedData}
+                      onCheckedChange={(checked) => {
+                        setIsSimulatedData(checked)
+                        if (!checked) {
+                          setScenario("normal")
+                        } else {
+                          // Set default to "network" when switching to simulated data
+                          setScenario("network")
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
+                  </div>
+
+                  {isSimulatedData && (
+                    <Select value={scenario} onValueChange={setScenario}>
+                      <SelectTrigger className="w-48 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="network">{t("network_incident")}</SelectItem>
+                        <SelectItem value="app">{t("app_incident")}</SelectItem>
+                        <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
+                        <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </div>
 
-              {isSimulatedData && (
-                <Select value={scenario} onValueChange={setScenario}>
-                  <SelectTrigger className="w-48 h-8">
+              <div className="ml-auto flex items-center gap-4">
+                <Select value={timeRange} onValueChange={setTimeRange}>
+                  <SelectTrigger className="w-32 h-8">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="network">{t("network_incident")}</SelectItem>
-                    <SelectItem value="app">{t("app_incident")}</SelectItem>
-                    <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
-                    <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
+                    <SelectItem value="5m">{t("last_5m")}</SelectItem>
+                    <SelectItem value="15m">{t("last_15m")}</SelectItem>
+                    <SelectItem value="1h">{t("last_1h")}</SelectItem>
+                    <SelectItem value="4h">{t("last_4h")}</SelectItem>
                   </SelectContent>
                 </Select>
-              )}
+
+                {badge && (
+                  <Badge
+                    variant={badge.color === "red" ? "destructive" : badge.color === "orange" ? "secondary" : "default"}
+                    className={
+                      badge.color === "gray" ? "bg-muted text-muted-foreground" :
+                      badge.color === "blue" ? "bg-blue-100 text-blue-700 border-blue-200" :
+                      badge.color === "purple" ? "bg-purple-100 text-purple-700 border-purple-200" : ""
+                    }
+                  >
+                    {badge.text}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
+        </>
+      )}
 
-          <div className="ml-auto flex items-center gap-4">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5m">{t("last_5m")}</SelectItem>
-                <SelectItem value="15m">{t("last_15m")}</SelectItem>
-                <SelectItem value="1h">{t("last_1h")}</SelectItem>
-                <SelectItem value="4h">{t("last_4h")}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {badge && (
-              <Badge
-                variant={badge.color === "red" ? "destructive" : badge.color === "orange" ? "secondary" : "default"}
-                className={
-                  badge.color === "gray" ? "bg-muted text-muted-foreground" :
-                  badge.color === "blue" ? "bg-blue-100 text-blue-700 border-blue-200" :
-                  badge.color === "purple" ? "bg-purple-100 text-purple-700 border-purple-200" : ""
-                }
-              >
-                {badge.text}
-              </Badge>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Dashboard Content */}
-      <div className="flex-1 p-6 overflow-y-auto">
+      {/* Dashboard Content - Added overflow-y-auto for proper scrolling */}
+      <div className="flex-1 overflow-y-auto p-6">
         <div className="space-y-6">
           {/* Executive Summary - Health Overview */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
@@ -496,7 +518,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                       <span className="font-medium">Network Health</span>
                     </div>
                     <span className="text-2xl font-bold text-foreground">
-                      {nfmt(nhi, { maximumFractionDigits: 0 })}
+                      {nfmt(nhi, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <Progress value={nhi} className="h-2 mb-2" />
@@ -520,7 +542,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                       <span className="font-medium">Transaction Health</span>
                     </div>
                     <span className="text-2xl font-bold text-foreground">
-                      {nfmt(thi, { maximumFractionDigits: 0 })}
+                      {nfmt(thi, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <Progress value={thi} className="h-2 mb-2" />
@@ -555,7 +577,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{nfmt(kpi?.req || 0)}</div>
+                      <div className="text-2xl font-bold text-foreground">{nfmt(kpi?.req || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                       <div className="text-sm text-muted-foreground">Requests/sec</div>
                     </div>
                     <div className="text-center">
@@ -563,7 +585,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                       <div className="text-sm text-muted-foreground">Success Rate</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-foreground">{kpi?.respP95.toFixed(0) || "0"}ms</div>
+                      <div className="text-2xl font-bold text-foreground">{kpi?.respP95.toFixed(2) || "0.00"}ms</div>
                       <div className="text-sm text-muted-foreground">Response P95</div>
                     </div>
                     <div className="text-center">
@@ -797,7 +819,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card className="border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950/20">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">🔴 Network Issue Pattern</h3>
+                  <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">Network Issue Pattern</h3>
                   <div className="text-sm text-red-700 dark:text-red-300">
                     • Transaction failure rate ↑<br/>
                     • Packet loss/retransmission ↑<br/>
@@ -809,7 +831,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
               <Card className="border-orange-200 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/20">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">🟡 Application Issue Pattern</h3>
+                  <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Application Issue Pattern</h3>
                   <div className="text-sm text-orange-700 dark:text-orange-300">
                     • Transaction failure rate ↑<br/>
                     • Network metrics normal<br/>
@@ -821,7 +843,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
               <Card className="border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/20">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">🔵 Cross-border Issue Pattern</h3>
+                  <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Cross-border Issue Pattern</h3>
                   <div className="text-sm text-blue-700 dark:text-blue-300">
                     • Transaction volume drops<br/>
                     • Packet loss rises<br/>
@@ -837,8 +859,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">
                   Response Time Distribution by Return Code
                 </CardTitle>
                 <div className="text-sm text-muted-foreground">
@@ -853,7 +874,6 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                         { name: t("success"), avg: avg(windowPoints, 'respP95', 'codeSuccess') },
                         { name: t("fourxx"), avg: avg(windowPoints, 'respP95', 'code4xx') },
                         { name: t("fivexx"), avg: avg(windowPoints, 'respP95', 'code5xx') },
-                        { name: t("timeout"), avg: avg(windowPoints, 'respP95', 'codeTimeout') },
                       ]}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
@@ -869,7 +889,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground mt-2">
-                  💡 High timeout response times indicate network timeouts vs application processing delays
+                  💡 Higher response times for error codes (4xx/5xx) may indicate application processing issues
                 </div>
               </CardContent>
             </Card>

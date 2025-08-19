@@ -210,7 +210,7 @@ const Badge = ({ children, color = "gray" }) => {
 const Toggle = ({ checked, onChange, label }) => (
   <label className="inline-flex items-center gap-2 cursor-pointer select-none">
     <input type="checkbox" className="peer hidden" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-    <span className={`w-10 h-6 rounded-full transition bg-gray-300 relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:bg-white after:rounded-full after:transition peer-checked:bg-blue-500 peer-checked:after:translate-x-4`}></span>
+    <span className={`w-10 h-6 rounded-full transition bg-gray-300 relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:bg-white after:rounded-full after:transition peer-checked:bg-blue-500 peer-checked:after:translate-x-4 cursor-pointer`}></span>
     <span className="text-sm text-gray-700">{label}</span>
   </label>
 );
@@ -317,15 +317,15 @@ function genSeries({ minutes = 60, scenario = "normal", tfmt }) {
     points.push({
       ts,
       time: tfmt(ts),
-      rtt: +rtt.toFixed(1),
+      rtt: +rtt.toFixed(2),
       loss: +loss.toFixed(2),
       retrans: +retrans.toFixed(2),
       conn: Math.round(conn),
-      inMbps: +inMbps.toFixed(1),
-      outMbps: +outMbps.toFixed(1),
+      inMbps: +inMbps.toFixed(2),
+      outMbps: +outMbps.toFixed(2),
       req: Math.round(req),
       successRate: +successRate.toFixed(2),
-      respP95: +resp.toFixed(1),
+      respP95: +resp.toFixed(2),
       errorRate: +errorRate.toFixed(2),
       codeSuccess: +(100 - errorRate).toFixed(2),
       code4xx: +fourXXRate.toFixed(2),
@@ -351,7 +351,7 @@ function calcNHI(windowPoints) {
   const connZ = zscore(windowPoints.map((p) => p.conn), windowPoints.at(-1).conn);
   const w1 = 0.35, w2 = 0.3, w3 = 0.2, w4 = 0.15;
   const raw = w1 * Math.max(0, rttZ) + w2 * Math.max(0, lossZ) + w3 * Math.max(0, retransZ) + w4 * Math.max(0, connZ);
-  return Math.max(0, Math.min(100, 100 - 18 * raw));
+  return +Math.max(0, Math.min(100, 100 - 18 * raw)).toFixed(2);
 }
 
 function calcTHI(windowPoints) {
@@ -363,7 +363,7 @@ function calcTHI(windowPoints) {
   const eZ = zscore(windowPoints.map((p) => p.errorRate), err);
   const a1 = 0.45, a2 = 0.35, a3 = 0.2;
   const raw = a1 * Math.max(0, sZ) + a2 * Math.max(0, pZ) + a3 * Math.max(0, eZ);
-  return Math.max(0, Math.min(100, 100 - 20 * raw));
+  return +Math.max(0, Math.min(100, 100 - 20 * raw)).toFixed(2);
 }
 
 function healthColor(v) {
@@ -484,11 +484,11 @@ export default function VisaNetworkDashboard() {
           {/* 右侧：健康条 + 徽章 */}
           <div className="ml-auto flex items-center gap-4">
             <div className="w-56">
-              <div className="flex items-center justify-between text-sm mb-1"><span>{t("nhi")}</span><span className={`font-semibold text-${healthColor(nhi) === "green" ? "green" : healthColor(nhi) === "orange" ? "amber" : "rose"}-600`}>{nfmt(nhi, { maximumFractionDigits: 0 })}</span></div>
+              <div className="flex items-center justify-between text-sm mb-1"><span>{t("nhi")}</span><span className={`font-semibold text-${healthColor(nhi) === "green" ? "green" : healthColor(nhi) === "orange" ? "amber" : "rose"}-600`}>{nfmt(nhi, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
               <Progress value={nhi} color={healthColor(nhi)} />
             </div>
             <div className="w-56">
-              <div className="flex items-center justify-between text-sm mb-1"><span>{t("thi")}</span><span className={`font-semibold text-${healthColor(thi) === "green" ? "green" : healthColor(thi) === "orange" ? "amber" : "rose"}-600`}>{nfmt(thi, { maximumFractionDigits: 0 })}</span></div>
+              <div className="flex items-center justify-between text-sm mb-1"><span>{t("thi")}</span><span className={`font-semibold text-${healthColor(thi) === "green" ? "green" : healthColor(thi) === "orange" ? "amber" : "rose"}-600`}>{nfmt(thi, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
               <Progress value={thi} color={healthColor(thi)} />
             </div>
             <Badge color={badge.color}>{badge.text}</Badge>
@@ -572,7 +572,7 @@ export default function VisaNetworkDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
               <div>
                 <div className="text-sm text-gray-500 mb-1">{t("req")}</div>
-                <div className="text-2xl font-semibold">{nfmt(kpi.req)}</div>
+                <div className="text-2xl font-semibold">{nfmt(kpi.req, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 <div className="text-xs text-gray-500">{t("latest")}</div>
               </div>
               <div>
@@ -582,7 +582,7 @@ export default function VisaNetworkDashboard() {
               </div>
               <div>
                 <div className="text-sm text-gray-500 mb-1">{t("respP95")}</div>
-                <div className="text-2xl font-semibold">{kpi.respP95.toFixed(0)}</div>
+                <div className="text-2xl font-semibold">{kpi.respP95.toFixed(2)}</div>
                 <div className="text-xs text-gray-500">{t("latest")}</div>
               </div>
               <div>
@@ -681,5 +681,5 @@ function avg(points, valueKey, weightKey) {
     wsum += w;
     vsum += p[valueKey] * w;
   }
-  return +(vsum / wsum).toFixed(1);
+  return +(vsum / wsum).toFixed(2);
 }

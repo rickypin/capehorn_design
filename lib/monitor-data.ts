@@ -61,15 +61,15 @@ export function generateMiniCardData(type: 'network' | 'transaction'): MonitorDa
     data.push({
       ts,
       time,
-      rtt: Math.max(10, baseRtt + baseRtt * noise()),
-      loss: Math.max(0, baseLoss + baseLoss * noise()),
-      retrans: Math.max(0, baseRetrans + baseRetrans * noise()),
-      inMbps: Math.max(10, baseInMbps + baseInMbps * noise()),
-      outMbps: Math.max(10, baseOutMbps + baseOutMbps * noise()),
-      req: Math.max(50, baseReq + baseReq * noise()),
-      successRate: Math.min(100, Math.max(95, baseSuccessRate + baseSuccessRate * noise() * 0.1)),
-      respP95: Math.max(50, baseRespP95 + baseRespP95 * noise()),
-      errorRate: Math.max(0, baseErrorRate + baseErrorRate * noise()),
+      rtt: +Math.max(10, baseRtt + baseRtt * noise()).toFixed(2),
+      loss: +Math.max(0, baseLoss + baseLoss * noise()).toFixed(2),
+      retrans: +Math.max(0, baseRetrans + baseRetrans * noise()).toFixed(2),
+      inMbps: +Math.max(10, baseInMbps + baseInMbps * noise()).toFixed(2),
+      outMbps: +Math.max(10, baseOutMbps + baseOutMbps * noise()).toFixed(2),
+      req: Math.round(Math.max(50, baseReq + baseReq * noise())),
+      successRate: +Math.min(100, Math.max(95, baseSuccessRate + baseSuccessRate * noise() * 0.1)).toFixed(2),
+      respP95: +Math.max(50, baseRespP95 + baseRespP95 * noise()).toFixed(2),
+      errorRate: +Math.max(0, baseErrorRate + baseErrorRate * noise()).toFixed(2),
     })
   }
 
@@ -79,7 +79,7 @@ export function generateMiniCardData(type: 'network' | 'transaction'): MonitorDa
 // Calculate Network Health Indicator
 export function calculateNHI(points: MonitorDataPoint[]): number {
   if (!points.length) return 0
-  
+
   const avgRtt = points.reduce((sum, p) => sum + p.rtt, 0) / points.length
   const avgLoss = points.reduce((sum, p) => sum + p.loss, 0) / points.length
   const avgRetrans = points.reduce((sum, p) => sum + p.retrans, 0) / points.length
@@ -88,13 +88,13 @@ export function calculateNHI(points: MonitorDataPoint[]): number {
   const lossScore = Math.max(0, 100 - avgLoss * 20)
   const retransScore = Math.max(0, 100 - avgRetrans * 10)
 
-  return Math.round((rttScore + lossScore + retransScore) / 3)
+  return +((rttScore + lossScore + retransScore) / 3).toFixed(2)
 }
 
 // Calculate Transaction Health Indicator
 export function calculateTHI(points: MonitorDataPoint[]): number {
   if (!points.length) return 0
-  
+
   const avgSuccessRate = points.reduce((sum, p) => sum + p.successRate, 0) / points.length
   const avgRespP95 = points.reduce((sum, p) => sum + p.respP95, 0) / points.length
   const avgErrorRate = points.reduce((sum, p) => sum + p.errorRate, 0) / points.length
@@ -103,7 +103,7 @@ export function calculateTHI(points: MonitorDataPoint[]): number {
   const respScore = Math.max(0, 100 - (avgRespP95 - 200) * 0.1)
   const errorScore = Math.max(0, 100 - avgErrorRate * 10)
 
-  return Math.round((successScore + respScore + errorScore) / 3)
+  return +((successScore + respScore + errorScore) / 3).toFixed(2)
 }
 
 // Get health indicator color
