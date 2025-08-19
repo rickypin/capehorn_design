@@ -10,10 +10,8 @@ import { Switch } from "@/components/ui/switch"
 import {
   Activity,
   Wifi,
-  XCircle,
   BarChart3,
   TrendingUp,
-  Clock,
   Globe,
 } from "lucide-react"
 import {
@@ -455,12 +453,35 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
             <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">VISA Service Health Overview</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Overall Status */}
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-2">
-                  {Math.min(nhi, thi) >= 80 ? "🟢" : Math.min(nhi, thi) >= 60 ? "🟡" : "🔴"}
+              {/* Overall Status - Minimal Modern Design */}
+              <div className={`rounded-lg p-6 text-center transition-all duration-200 ${
+                Math.min(nhi, thi) >= 80 ? "bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800" :
+                Math.min(nhi, thi) >= 60 ? "bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800" :
+                "bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800"
+              }`}>
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                  Math.min(nhi, thi) >= 80 ? "bg-emerald-100 dark:bg-emerald-900/50" :
+                  Math.min(nhi, thi) >= 60 ? "bg-amber-100 dark:bg-amber-900/50" :
+                  "bg-red-100 dark:bg-red-900/50"
+                }`}>
+                  <svg className={`w-8 h-8 ${
+                    Math.min(nhi, thi) >= 80 ? "text-emerald-600 dark:text-emerald-400" :
+                    Math.min(nhi, thi) >= 60 ? "text-amber-600 dark:text-amber-400" :
+                    "text-red-600 dark:text-red-400"
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {Math.min(nhi, thi) >= 80 ?
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /> :
+                      Math.min(nhi, thi) >= 60 ?
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" /> :
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    }
+                  </svg>
                 </div>
-                <div className="text-lg font-semibold text-foreground">
+                <div className={`text-xl font-semibold mb-2 ${
+                  Math.min(nhi, thi) >= 80 ? "text-emerald-700 dark:text-emerald-300" :
+                  Math.min(nhi, thi) >= 60 ? "text-amber-700 dark:text-amber-300" :
+                  "text-red-700 dark:text-red-300"
+                }`}>
                   {Math.min(nhi, thi) >= 80 ? "Healthy" : Math.min(nhi, thi) >= 60 ? "Warning" : "Critical"}
                 </div>
                 <div className="text-sm text-muted-foreground">Overall Status</div>
@@ -600,8 +621,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card className="border-blue-200 dark:border-blue-700">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg">
                     End-to-End Latency
                   </CardTitle>
                 </CardHeader>
@@ -631,8 +651,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
               <Card className="border-blue-200 dark:border-blue-700">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <XCircle className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg">
                     Packet Loss & Retransmission
                   </CardTitle>
                 </CardHeader>
@@ -664,8 +683,7 @@ export default function VisaPreview({ className = "" }: VisaPreviewProps) {
 
               <Card className="border-blue-200 dark:border-blue-700">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-lg">
                     Traffic & Connections
                   </CardTitle>
                 </CardHeader>
