@@ -26,6 +26,14 @@ export default function MonitorListPage() {
       name: "VISA Service",
       status: "active",
       lastUpdated: "2 minutes ago",
+      route: "visa_service",
+    },
+    {
+      id: "2",
+      name: "VISA Service (Intermediate)",
+      status: "active",
+      lastUpdated: "5 minutes ago",
+      route: "visa_service_intermediate",
     },
   ]
 
@@ -35,8 +43,11 @@ export default function MonitorListPage() {
   }
 
   const handleMonitorClick = (monitorId: string) => {
-    // Navigate to the VISA Service page
-    router.push("/monitor/visa_service")
+    // Find the monitor and navigate to its route
+    const monitor = monitors.find(m => m.id === monitorId)
+    if (monitor) {
+      router.push(`/monitor/${monitor.route}`)
+    }
   }
 
   return (

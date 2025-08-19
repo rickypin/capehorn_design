@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import VisaPreview from "@/components/shared/VisaPreview"
 
-export default function VisaServicePage() {
+export default function VisaServiceIntermediatePage() {
   const router = useRouter()
 
   return (
@@ -29,7 +29,7 @@ export default function VisaServicePage() {
               </button>
               <span className="text-muted-foreground">/</span>
               <span className="text-muted-foreground font-medium">
-                VISA Service
+                VISA Service (Intermediate)
               </span>
             </nav>
           </div>

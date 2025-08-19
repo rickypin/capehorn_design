@@ -1,0 +1,722 @@
+"use client"
+
+import type React from "react"
+import { useState, useEffect, useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Activity,
+  Wifi,
+  XCircle,
+  BarChart3,
+  TrendingUp,
+  Clock,
+  Globe,
+} from "lucide-react"
+import {
+  LineChart,
+  Line,
+  Area,
+  AreaChart,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ComposedChart,
+  ScatterChart,
+  Scatter,
+  ZAxis,
+  ReferenceLine,
+} from "recharts"
+
+// i18n Dictionary for VISA Dashboard
+const DICT = {
+  "zh-CN": {
+    title: "VISA Service",
+    timeRange: "时间窗",
+    scenario: "场景",
+    scenario_normal: "场景：正常",
+    scenario_network: "场景：网络异常",
+    scenario_app: "场景：应用异常",
+    scenario_crossborder: "场景：跨境路由抖动",
+    scenario_retrans: "场景：重传风暴",
+    nhi: "NHI 网络影响",
+    thi: "THI 交易健康",
+    card_latency: "端到端延迟 P50/P95/P99 (ms)",
+    filterable: "可刷选",
+    card_loss_retrans: "丢包率 / TCP 重传率 (%)",
+    dual_axis: "双轴",
+    card_bitrate_conn: "入/出站比特率 + 并发连接数",
+    area_line: "面积+线",
+    kpi_title: "交易验证区（KPI 与返回码分布）",
+    legend_hint: "点击图例可高亮",
+    req: "请求数 (rps)",
+    succRate: "成功率 (%)",
+    respP95: "响应时间 P95 (ms)",
+    errRate: "错误率 (5xx+超时, %)",
+    latest: "最新",
+    success: "成功",
+    fourxx: "4xx",
+    fivexx: "5xx",
+    timeout: "超时",
+    corr_title_1: "成功率 vs 网络延迟（双轴诊断）",
+    corr_read_1: "蓝色虚线为 99.5% SLA 基准",
+    corr_title_2: "丢包率 vs 响应时间（气泡图）",
+    corr_read_2: "气泡大小代表重传率",
+    bar_title: "响应时间分布（按返回码分组）",
+    weighted_avg: "加权平均",
+    footer: "数据来源：VISA 网络监控系统",
+    badge_network: "网络异常",
+    badge_app: "应用异常",
+    badge_crossborder: "跨境抖动",
+    badge_retrans: "重传风暴",
+    badge_normal: "正常",
+  },
+  "en-US": {
+    title: "VISA Service",
+    timeRange: "Time Range",
+    scenario: "Scenario",
+    scenario_normal: "Scenario: Normal",
+    scenario_network: "Scenario: Network Incident",
+    scenario_app: "Scenario: App/Dependency Incident",
+    scenario_crossborder: "Scenario: Cross-border Jitter",
+    scenario_retrans: "Scenario: Retransmission Storm",
+    nhi: "NHI Network Impact",
+    thi: "THI Transaction Health",
+    card_latency: "End-to-end Latency P50/P95/P99 (ms)",
+    filterable: "Filterable",
+    card_loss_retrans: "Packet Loss / TCP Retransmission (%)",
+    dual_axis: "Dual Axis",
+    card_bitrate_conn: "Ingress/Egress Bitrate + Concurrent Connections",
+    area_line: "Area + Line",
+    kpi_title: "Transaction Validation (KPIs & Response Codes)",
+    legend_hint: "Click legend to highlight",
+    req: "Requests (rps)",
+    succRate: "Success Rate (%)",
+    respP95: "Response Time P95 (ms)",
+    errRate: "Error Rate (5xx+timeout, %)",
+    latest: "Latest",
+    success: "Success",
+    fourxx: "4xx",
+    fivexx: "5xx",
+    timeout: "Timeout",
+    corr_title_1: "Success Rate vs Network Latency (Dual Axis)",
+    corr_read_1: "Blue dashed line is 99.5% SLA baseline",
+    corr_title_2: "Packet Loss vs Response Time (Bubble Chart)",
+    corr_read_2: "Bubble size represents retransmission rate",
+    bar_title: "Response Time Distribution (Grouped by Response Code)",
+    weighted_avg: "Weighted Average",
+    footer: "Data Source: VISA Network Monitoring System",
+    badge_network: "Network Issue",
+    badge_app: "App Issue",
+    badge_crossborder: "Cross-border Jitter",
+    badge_retrans: "Retransmission Storm",
+    badge_normal: "Normal",
+  },
+}
+
+// i18n Hook
+function useI18n(defaultLocale: string = "en-US") {
+  const [locale, setLocale] = useState(defaultLocale)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  const t = (key: string): string => {
+    return DICT[locale as keyof typeof DICT]?.[key as keyof typeof DICT["en-US"]] || key
+  }
+
+  const nfmt = (value: number, options?: Intl.NumberFormatOptions) => {
+    if (!isClient) return value.toString()
+    return new Intl.NumberFormat(locale, options).format(value)
+  }
+
+  const tfmt = (date: Date) => {
+    if (!isClient) return date.toISOString()
+    return new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(date)
+  }
+
+  return { locale, setLocale, t, nfmt, tfmt, isClient }
+}
+
+// Data generation and utility functions
+function genSeries({ minutes, scenario, tfmt }: { minutes: number; scenario: string; tfmt: (date: Date) => string }) {
+  const now = Date.now()
+  const data = []
+
+  for (let i = minutes; i >= 0; i--) {
+    const ts = now - i * 60 * 1000
+    const time = tfmt(new Date(ts))
+
+    let baseRtt = 120
+    let baseLoss = 0.1
+    let baseRetrans = 1.0
+    let baseConn = 800
+    let baseInMbps = 180
+    let baseOutMbps = 120
+    let baseReq = 300
+    let baseSuccessRate = 99.7
+    let baseRespP95 = 350
+    let baseErrorRate = 0.2
+
+    // Apply scenario-specific modifications
+    if (scenario === "network") {
+      if (i <= 20) {
+        baseRtt += Math.random() * 200 + 100
+        baseLoss += Math.random() * 2 + 1
+        baseRetrans += Math.random() * 5 + 2
+        baseSuccessRate -= Math.random() * 5 + 2
+        baseErrorRate += Math.random() * 3 + 1
+        baseRespP95 += Math.random() * 300 + 200
+      }
+    } else if (scenario === "app") {
+      if (i <= 15) {
+        baseSuccessRate -= Math.random() * 10 + 5
+        baseErrorRate += Math.random() * 8 + 5
+        baseRespP95 += Math.random() * 500 + 300
+        baseReq *= 0.7 + Math.random() * 0.2
+      }
+    } else if (scenario === "crossborder") {
+      if (i <= 25) {
+        baseRtt += Math.sin(i * 0.5) * 150 + 100
+        baseLoss += Math.abs(Math.sin(i * 0.3)) * 1.5
+        baseRetrans += Math.abs(Math.cos(i * 0.4)) * 3
+      }
+    } else if (scenario === "retrans") {
+      if (i <= 18) {
+        baseRetrans += Math.random() * 15 + 10
+        baseInMbps += Math.random() * 100 + 50
+        baseOutMbps += Math.random() * 80 + 40
+        baseRtt += Math.random() * 100 + 50
+      }
+    }
+
+    // Add some noise
+    const noise = () => (Math.random() - 0.5) * 0.1
+
+    data.push({
+      ts,
+      time,
+      rtt: Math.max(10, baseRtt + baseRtt * noise()),
+      loss: Math.max(0, baseLoss + baseLoss * noise()),
+      retrans: Math.max(0, baseRetrans + baseRetrans * noise()),
+      conn: Math.max(100, baseConn + baseConn * noise()),
+      inMbps: Math.max(10, baseInMbps + baseInMbps * noise()),
+      outMbps: Math.max(10, baseOutMbps + baseOutMbps * noise()),
+      req: Math.max(50, baseReq + baseReq * noise()),
+      successRate: Math.min(100, Math.max(0, baseSuccessRate + baseSuccessRate * noise() * 0.1)),
+      respP95: Math.max(50, baseRespP95 + baseRespP95 * noise()),
+      errorRate: Math.max(0, baseErrorRate + baseErrorRate * noise()),
+      codeSuccess: Math.max(0, 100 - baseErrorRate - 0.1),
+      code4xx: Math.max(0, 0.1 + Math.random() * 0.1),
+      code5xx: Math.max(0, baseErrorRate * 0.7),
+      codeTimeout: Math.max(0, baseErrorRate * 0.3),
+    })
+  }
+
+  return data
+}
+
+function calcNHI(points: any[]) {
+  if (!points.length) return 0
+  const avgRtt = points.reduce((sum, p) => sum + p.rtt, 0) / points.length
+  const avgLoss = points.reduce((sum, p) => sum + p.loss, 0) / points.length
+  const avgRetrans = points.reduce((sum, p) => sum + p.retrans, 0) / points.length
+
+  const rttScore = Math.max(0, 100 - (avgRtt - 100) * 0.5)
+  const lossScore = Math.max(0, 100 - avgLoss * 20)
+  const retransScore = Math.max(0, 100 - avgRetrans * 10)
+
+  return Math.round((rttScore + lossScore + retransScore) / 3)
+}
+
+function calcTHI(points: any[]) {
+  if (!points.length) return 0
+  const avgSuccessRate = points.reduce((sum, p) => sum + p.successRate, 0) / points.length
+  const avgRespP95 = points.reduce((sum, p) => sum + p.respP95, 0) / points.length
+  const avgErrorRate = points.reduce((sum, p) => sum + p.errorRate, 0) / points.length
+
+  const successScore = avgSuccessRate
+  const respScore = Math.max(0, 100 - (avgRespP95 - 200) * 0.1)
+  const errorScore = Math.max(0, 100 - avgErrorRate * 10)
+
+  return Math.round((successScore + respScore + errorScore) / 3)
+}
+
+function healthColor(value: number) {
+  if (value >= 80) return "green"
+  if (value >= 60) return "orange"
+  return "red"
+}
+
+function zscore(values: number[], target: number) {
+  const mean = values.reduce((sum, v) => sum + v, 0) / values.length
+  const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length
+  const stddev = Math.sqrt(variance)
+  return stddev === 0 ? 0 : (target - mean) / stddev
+}
+
+function attributionBadge(nhi: number, thi: number, points: any[], t: (k: string) => string) {
+  const last = points.at(-1)
+  const window = points.slice(-15)
+  const nhiPrev = calcNHI(window.slice(0, -3))
+  const thiPrev = calcTHI(window.slice(0, -3))
+  const nhiDrop = nhiPrev - nhi
+  const thiDrop = thiPrev - thi
+
+  const reqFlat = Math.abs(zscore(window.map((p) => p.req), last.req)) < 0.6
+  const bitrateUp = zscore(window.map((p) => p.inMbps + p.outMbps), last.inMbps + last.outMbps) > 1.0
+
+  if (bitrateUp && reqFlat && zscore(window.map((p) => p.retrans), last.retrans) > 1.2) {
+    return { text: t("badge_retrans"), color: "purple" }
+  }
+
+  if (nhiDrop > 15 && thiDrop > 10) {
+    return { text: t("badge_network"), color: "red" }
+  }
+  if (thiDrop > 15 && nhiDrop < 5) {
+    return { text: t("badge_app"), color: "orange" }
+  }
+  if (nhiDrop > 10 && Math.abs(zscore(window.map((p) => p.rtt), last.rtt)) > 1.5) {
+    return { text: t("badge_crossborder"), color: "blue" }
+  }
+
+  return null
+}
+
+function avg(points: any[], valueKey: string, weightKey: string) {
+  let wsum = 0, vsum = 0
+  for (const p of points) {
+    const w = Math.max(0.0001, p[weightKey])
+    wsum += w
+    vsum += p[valueKey] * w
+  }
+  return +(vsum / wsum).toFixed(1)
+}
+
+interface VisaPreviewProps {
+  className?: string
+}
+
+export default function VisaPreview({ className = "" }: VisaPreviewProps) {
+  const { locale, setLocale, t, nfmt, tfmt, isClient } = useI18n("en-US")
+  const [timeRange, setTimeRange] = useState("15m")
+  const [scenario, setScenario] = useState("normal")
+
+  const minutes = timeRange === "5m" ? 5 : timeRange === "15m" ? 15 : timeRange === "1h" ? 60 : 240
+
+  const data = useMemo(() => {
+    if (!isClient) {
+      return Array.from({ length: minutes + 1 }, (_, i) => ({
+        ts: Date.now() - i * 60 * 1000,
+        time: "00:00",
+        rtt: 120,
+        loss: 0.1,
+        retrans: 1.0,
+        conn: 800,
+        inMbps: 180,
+        outMbps: 120,
+        req: 300,
+        successRate: 99.7,
+        respP95: 350,
+        errorRate: 0.2,
+        codeSuccess: 99.8,
+        code4xx: 0.1,
+        code5xx: 0.08,
+        codeTimeout: 0.02,
+      }))
+    }
+    return genSeries({ minutes, scenario, tfmt })
+  }, [minutes, scenario, tfmt, isClient])
+
+  const windowPoints = data
+  const nhi = useMemo(() => calcNHI(windowPoints), [windowPoints])
+  const thi = useMemo(() => calcTHI(windowPoints), [windowPoints])
+  const badge = useMemo(() => attributionBadge(nhi, thi, windowPoints, t), [nhi, thi, windowPoints, t])
+  const kpi = windowPoints.at(-1)
+
+  return (
+    <div className={`flex flex-col h-full bg-background ${className}`}>
+      {/* Header Controls */}
+      <div className="p-4 border-b border-border bg-card">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <Globe className="h-5 w-5 text-primary" />
+              {t("title")}
+            </h1>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{t("timeRange")}:</span>
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5m">5m</SelectItem>
+                  <SelectItem value="15m">15m</SelectItem>
+                  <SelectItem value="1h">1h</SelectItem>
+                  <SelectItem value="4h">4h</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{t("scenario")}:</span>
+              <Select value={scenario} onValueChange={setScenario}>
+                <SelectTrigger className="w-40 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">{t("scenario_normal")}</SelectItem>
+                  <SelectItem value="network">{t("scenario_network")}</SelectItem>
+                  <SelectItem value="app">{t("scenario_app")}</SelectItem>
+                  <SelectItem value="crossborder">{t("scenario_crossborder")}</SelectItem>
+                  <SelectItem value="retrans">{t("scenario_retrans")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="ml-auto flex items-center gap-4">
+            {badge && (
+              <Badge
+                variant={badge.color === "red" ? "destructive" : badge.color === "orange" ? "secondary" : "default"}
+                className={
+                  badge.color === "gray" ? "bg-muted text-muted-foreground" :
+                  badge.color === "blue" ? "bg-blue-100 text-blue-700 border-blue-200" :
+                  badge.color === "purple" ? "bg-purple-100 text-purple-700 border-purple-200" : ""
+                }
+              >
+                {badge.text}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Dashboard Content */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        <div className="space-y-4">
+          {/* Health Indices Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  {t("nhi")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-bold text-foreground">
+                      {nfmt(nhi, { maximumFractionDigits: 0 })}
+                    </span>
+                    <span className={`text-sm font-medium px-2 py-1 rounded ${
+                      healthColor(nhi) === "green" ? "bg-emerald-100 text-emerald-700" :
+                      healthColor(nhi) === "orange" ? "bg-amber-100 text-amber-700" :
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      {healthColor(nhi) === "green" ? "Healthy" :
+                       healthColor(nhi) === "orange" ? "Warning" : "Critical"}
+                    </span>
+                  </div>
+                  <Progress value={nhi} className="h-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Network Health Index based on latency, packet loss, and retransmission metrics
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  {t("thi")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-bold text-foreground">
+                      {nfmt(thi, { maximumFractionDigits: 0 })}
+                    </span>
+                    <span className={`text-sm font-medium px-2 py-1 rounded ${
+                      healthColor(thi) === "green" ? "bg-emerald-100 text-emerald-700" :
+                      healthColor(thi) === "orange" ? "bg-amber-100 text-amber-700" :
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      {healthColor(thi) === "green" ? "Healthy" :
+                       healthColor(thi) === "orange" ? "Warning" : "Critical"}
+                    </span>
+                  </div>
+                  <Progress value={thi} className="h-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Transaction Health Index based on success rate, response time, and error rate
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Network Health Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  {t("card_latency")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ComposedChart data={windowPoints} syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" interval="preserveStartEnd"/>
+                        <YAxis yAxisId="left" orientation="left" />
+                        <Tooltip />
+                        <Line yAxisId="left" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} strokeWidth={2} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-primary" />
+                  {t("card_loss_retrans")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ComposedChart data={windowPoints} syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" interval="preserveStartEnd"/>
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip />
+                        <Line yAxisId="left" type="monotone" dataKey="loss" stroke="#f59e0b" name="Loss %" dot={false} />
+                        <Line yAxisId="right" type="monotone" dataKey="retrans" stroke="#ef4444" name="Retrans %" dot={false} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Wifi className="h-5 w-5 text-primary" />
+                  {t("card_bitrate_conn")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ComposedChart data={windowPoints} syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" interval="preserveStartEnd"/>
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip />
+                        <Area yAxisId="left" type="monotone" dataKey="inMbps" stackId="1" name="Ingress Mbps" fill="#bfdbfe" stroke="#60a5fa" />
+                        <Area yAxisId="left" type="monotone" dataKey="outMbps" stackId="1" name="Egress Mbps" fill="#c7d2fe" stroke="#818cf8" />
+                        <Line yAxisId="right" type="monotone" dataKey="conn" name="Concurrent" stroke="#10b981" dot={false} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Transaction Validation Section */}
+          <div className="grid grid-cols-1 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  {t("kpi_title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">{t("req")}</div>
+                    <div className="text-2xl font-semibold">{nfmt(kpi?.req || 0)}</div>
+                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">{t("succRate")}</div>
+                    <div className="text-2xl font-semibold">{kpi?.successRate.toFixed(2) || "0.00"}</div>
+                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">{t("respP95")}</div>
+                    <div className="text-2xl font-semibold">{kpi?.respP95.toFixed(0) || "0"}</div>
+                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">{t("errRate")}</div>
+                    <div className="text-2xl font-semibold">{kpi?.errorRate.toFixed(2) || "0.00"}</div>
+                    <div className="text-xs text-muted-foreground">{t("latest")}</div>
+                  </div>
+                </div>
+
+                <div className="h-56 mt-4">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <BarChart data={windowPoints} syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" interval="preserveStartEnd"/>
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="codeSuccess" stackId="codes" name={t("success")} fill="#10b981" />
+                        <Bar dataKey="code4xx" stackId="codes" name={t("fourxx")} fill="#f59e0b" />
+                        <Bar dataKey="code5xx" stackId="codes" name={t("fivexx")} fill="#ef4444" />
+                        <Bar dataKey="codeTimeout" stackId="codes" name={t("timeout")} fill="#6366f1" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Correlation Diagnostics Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("corr_title_1")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ComposedChart data={windowPoints} syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="time" interval="preserveStartEnd"/>
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip />
+                        <Line yAxisId="left" type="monotone" dataKey="successRate" stroke="#10b981" name="Success %" dot={false} />
+                        <Line yAxisId="right" type="monotone" dataKey="rtt" stroke="#6366f1" name="P95 RTT" dot={false} />
+                        <ReferenceLine yAxisId="left" y={99.5} stroke="#0ea5e9" strokeDasharray="4 4" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">{t("corr_read_1")}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("corr_title_2")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ScatterChart syncId="main">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" dataKey="loss" name="Loss %" domain={[0, 'dataMax + 0.5']} />
+                        <YAxis type="number" dataKey="respP95" name="P95 (ms)" />
+                        <ZAxis type="number" dataKey="retrans" range={[60, 200]} name="Retrans % (bubble)" />
+                        <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+                        <Scatter name="t" data={windowPoints} fill="#ef4444" />
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">{t("corr_read_2")}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("bar_title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  {isClient ? (
+                    <ResponsiveContainer>
+                      <ComposedChart data={[
+                        { name: t("success"), avg: avg(windowPoints, 'respP95', 'codeSuccess') },
+                        { name: t("fourxx"), avg: avg(windowPoints, 'respP95', 'code4xx') },
+                        { name: t("fivexx"), avg: avg(windowPoints, 'respP95', 'code5xx') },
+                      ]}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="avg" name={t("weighted_avg")} fill="#6366f1" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-muted-foreground">Loading chart...</div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">{t("footer")}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="pb-10 text-xs text-muted-foreground text-center">{t("footer")}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
