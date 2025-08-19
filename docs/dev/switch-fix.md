@@ -11,7 +11,7 @@ The SwitchToggle component was displaying abnormally with the text "Compare with
 ## Solution Applied
 
 ### 1. Updated Component Interface
-```typescript
+\`\`\`typescript
 const SwitchToggle = React.forwardRef<
   HTMLInputElement,
   Omit<React.ComponentPropsWithoutRef<"input">, "onChange"> & {
@@ -20,10 +20,10 @@ const SwitchToggle = React.forwardRef<
     onCheckedChange?: (checked: boolean) => void
   }
 >
-```
+\`\`\`
 
 ### 2. Proper Event Handling
-```typescript
+\`\`\`typescript
 <input 
   type="checkbox" 
   className="peer hidden" 
@@ -32,21 +32,21 @@ const SwitchToggle = React.forwardRef<
   onChange={(e) => onCheckedChange?.(e.target.checked)}
   {...props}
 />
-```
+\`\`\`
 
 ### 3. Text Layout Fix
-```typescript
+\`\`\`typescript
 {label && <span className="text-sm text-foreground whitespace-nowrap">{label}</span>}
-```
+\`\`\`
 
 ### 4. Updated Usage
-```typescript
+\`\`\`typescript
 <SwitchToggle 
   checked={compare} 
   onCheckedChange={setCompare}  // Changed from onChange
   label={t("compare7d")} 
 />
-```
+\`\`\`
 
 ## Key Improvements
 - ✅ **Proper TypeScript typing**: Eliminates type errors
@@ -88,7 +88,7 @@ Implemented a comprehensive color scheme that:
 - ✅ **Smooth Transitions**: 200ms duration for all state changes
 
 ### CSS Implementation
-```css
+\`\`\`css
 /* Switch Track */
 w-10 h-6 rounded-full bg-slate-300 border-slate-400
 dark:bg-slate-600 dark:border-slate-500
@@ -104,7 +104,7 @@ peer-checked:after:translate-x-4
 /* Hover Effects */
 hover:bg-slate-400 hover:border-slate-500
 peer-checked:hover:bg-primary/90
-```
+\`\`\`
 
 ### Positioning Fix
 Fixed toggle button vertical alignment using:

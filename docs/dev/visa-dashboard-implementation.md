@@ -98,7 +98,7 @@ Successfully redesigned the right-side dashboard of the AI Network Monitoring pr
 ## Key Algorithms
 
 ### Health Index Calculation
-```typescript
+\`\`\`typescript
 // NHI: Network Health Index
 function calcNHI(windowPoints) {
   const rttZ = zscore(rtt_values, latest_rtt)
@@ -111,7 +111,7 @@ function calcNHI(windowPoints) {
               0.20 * max(0, retransZ) + 0.15 * max(0, connZ)
   return max(0, min(100, 100 - 18 * raw))
 }
-```
+\`\`\`
 
 ### Attribution Logic
 - **Network Issues**: THI drop > 8 AND NHI drop > 10
@@ -133,7 +133,7 @@ Fixed the React hydration mismatch error that was occurring due to:
 - **Consistent Data**: Static fallback data during server-side rendering
 
 ### Technical Solution:
-```typescript
+\`\`\`typescript
 // Added client-side detection
 const [isClient, setIsClient] = useState(false)
 useEffect(() => { setIsClient(true) }, [])
@@ -146,7 +146,7 @@ const seededRandom = (seed: number) => {
 
 // Conditional chart rendering
 {isClient ? <ResponsiveContainer>...</ResponsiveContainer> : <LoadingState />}
-```
+\`\`\`
 
 ## Recent Updates
 

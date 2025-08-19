@@ -23,7 +23,7 @@
 - **灵活的显示模式** (预览模式 vs 正常模式)
 - **统一的点击处理**
 
-```typescript
+\`\`\`typescript
 export interface MonitorCardData {
   id: string
   name: string
@@ -34,7 +34,7 @@ export interface MonitorCardData {
   iconColor?: string
   statusColor?: string
 }
-```
+\`\`\`
 
 ### 2. 更新 Monitor 页面
 
@@ -82,7 +82,7 @@ export interface MonitorCardData {
 
 **对话页面中的 monitor 数据：**
 
-```typescript
+\`\`\`typescript
 const visaServiceMonitor: MonitorCardData = {
   id: "visa-service",
   name: "VISA Service Monitor",
@@ -102,7 +102,7 @@ const networkPriorityMonitor: MonitorCardData = {
   statusColor: "orange",
   route: "visa_service_intermediate"
 }
-```
+\`\`\`
 
 ## 验证结果
 
@@ -140,14 +140,14 @@ const networkPriorityMonitor: MonitorCardData = {
 ### 技术实现
 
 **数据生成** (`lib/monitor-data.ts`):
-```typescript
+\`\`\`typescript
 // 生成最近15分钟的模拟数据
 generateMiniCardData(type: 'network' | 'transaction')
 
 // 计算健康指标
 calculateNHI(points) // 网络健康指标
 calculateTHI(points) // 交易健康指标
-```
+\`\`\`
 
 **组件增强** (`components/shared/MonitorCard.tsx`):
 - 条件渲染：`showMetrics=true` 时显示增强版本
@@ -163,7 +163,7 @@ calculateTHI(points) // 交易健康指标
 
 ### 配置示例
 
-```typescript
+\`\`\`typescript
 // Monitor 页面配置
 {
   id: "1",
@@ -181,7 +181,7 @@ calculateTHI(points) // 交易健康指标
   type: "network",
   showMetrics: true, // 显示完整的增强内容
 }
-```
+\`\`\`
 
 ## Mini Card 样式统一 (2024-08-19)
 
@@ -198,7 +198,7 @@ calculateTHI(points) // 交易健康指标
 - 对话页面：显示增强版 mini card ✅
 
 **配置更新**:
-```typescript
+\`\`\`typescript
 // 对话页面中的配置更新
 const visaServiceMonitor: MonitorCardData = {
   // ... 其他配置
@@ -209,7 +209,7 @@ const networkPriorityMonitor: MonitorCardData = {
   // ... 其他配置
   showMetrics: true, // 从 false 改为 true
 }
-```
+\`\`\`
 
 ### 统一效果
 
