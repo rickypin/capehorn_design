@@ -14,7 +14,8 @@ import {
   Scatter,
   ComposedChart,
   XAxis,
-  YAxis
+  YAxis,
+  Tooltip
 } from "recharts"
 import { useMemo, useEffect, useState } from "react"
 import {
@@ -32,6 +33,84 @@ import FadeTitle from "./FadeTitle"
 export type ChartType = 'area' | 'line' | 'bar' | 'scatter' | 'composed' | 'step' |
   'gradient-area' | 'multi-line' | 'stacked-bar' | 'bubble' | 'heatmap' | 'radial' |
   'waterfall' | 'candlestick' | 'pulse-wave'
+
+// Custom Tooltip Component for Monitor Cards
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: any[]
+  label?: string
+  chartType?: ChartType
+  monitorType?: 'network' | 'transaction'
+}
+
+function CustomTooltip({ active, payload, label, chartType, monitorType }: CustomTooltipProps) {
+  if (!active || !payload || !payload.length) {
+    return null
+  }
+
+  // Define metric labels and units based on monitor type and chart type
+  const getMetricInfo = (dataKey: string) => {
+    const metricMap: Record<string, { label: string; unit: string; color?: string }> = {
+      // Network metrics
+      inMbps: { label: 'Inbound Traffic', unit: 'Mbps', color: '#3b82f6' },
+      outMbps: { label: 'Outbound Traffic', unit: 'Mbps', color: '#06b6d4' },
+      rtt: { label: 'Round Trip Time', unit: 'ms', color: '#ef4444' },
+      loss: { label: 'Packet Loss', unit: '%', color: '#f59e0b' },
+      retrans: { label: 'Retransmission', unit: '%', color: '#ef4444' },
+      // Transaction metrics
+      req: { label: 'Requests', unit: '/min', color: '#f59e0b' },
+      successRate: { label: 'Success Rate', unit: '%', color: '#10b981' },
+      respP95: { label: 'Response Time P95', unit: 'ms', color: '#6366f1' },
+      errorRate: { label: 'Error Rate', unit: '%', color: '#ef4444' },
+    }
+    return metricMap[dataKey] || { label: dataKey, unit: '', color: '#6b7280' }
+  }
+
+  return (
+    <div className="bg-background/95 backdrop-blur-sm border border-border corner-sm shadow-lg p-3 min-w-[200px] max-w-[250px] z-50 relative">
+      {label && (
+        <div className="text-xs text-muted-foreground mb-2 font-medium">
+          {label}
+        </div>
+      )}
+      <div className="space-y-1">
+        {payload.map((entry, index) => {
+          const metricInfo = getMetricInfo(entry.dataKey)
+          const value = typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value
+
+          return (
+            <div key={index} className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 corner-xs flex-shrink-0"
+                  style={{ backgroundColor: entry.color || metricInfo.color }}
+                />
+                <span className="text-xs font-medium text-foreground truncate">
+                  {metricInfo.label}
+                </span>
+              </div>
+              <span className="text-xs font-bold text-foreground whitespace-nowrap">
+                {value}{metricInfo.unit}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// Common tooltip configuration for better positioning
+const getTooltipConfig = (chartType: ChartType, monitorType: 'network' | 'transaction') => ({
+  content: <CustomTooltip chartType={chartType} monitorType={monitorType} />,
+  allowEscapeViewBox: { x: true, y: true },
+  offset: 15,
+  position: { x: undefined, y: undefined },
+  wrapperStyle: {
+    zIndex: 9999,
+    pointerEvents: 'none'
+  }
+})
 
 export interface MonitorCardData {
   id: string
@@ -160,6 +239,10 @@ export default function MonitorCard({
                 <stop offset="95%" stopColor={colors.primary} stopOpacity={0.05}/>
               </linearGradient>
             </defs>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Area
               type="monotone"
               dataKey="inMbps"
@@ -174,6 +257,10 @@ export default function MonitorCard({
       case 'line':
         return (
           <LineChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Line
               type="monotone"
               dataKey="req"
@@ -187,6 +274,10 @@ export default function MonitorCard({
       case 'bar':
         return (
           <BarChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+            />
             <Bar
               dataKey="req"
               fill={colors.primary}
@@ -199,6 +290,10 @@ export default function MonitorCard({
       case 'scatter':
         return (
           <ScatterChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ strokeDasharray: '3 3' }}
+            />
             <Scatter
               dataKey="rtt"
               fill={colors.primary}
@@ -209,6 +304,10 @@ export default function MonitorCard({
       case 'step':
         return (
           <LineChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Line
               type="stepAfter"
               dataKey="successRate"
@@ -222,6 +321,10 @@ export default function MonitorCard({
       case 'composed':
         return (
           <ComposedChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Bar dataKey="req" fill="#f59e0b" opacity={0.6} />
             <Line
               type="monotone"
@@ -243,6 +346,10 @@ export default function MonitorCard({
                 <stop offset="100%" stopColor="#10b981" stopOpacity={0.2}/>
               </linearGradient>
             </defs>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Area
               type="monotone"
               dataKey="inMbps"
@@ -257,6 +364,10 @@ export default function MonitorCard({
       case 'multi-line':
         return (
           <LineChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Line
               type="monotone"
               dataKey="req"
@@ -286,6 +397,10 @@ export default function MonitorCard({
       case 'stacked-bar':
         return (
           <BarChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+            />
             <Bar dataKey="req" stackId="a" fill="#3b82f6" />
             <Bar dataKey="rtt" stackId="a" fill="#f59e0b" />
             <Bar dataKey="loss" stackId="a" fill="#ef4444" />
@@ -295,6 +410,10 @@ export default function MonitorCard({
       case 'bubble':
         return (
           <ScatterChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ strokeDasharray: '3 3' }}
+            />
             <Scatter
               dataKey="rtt"
               fill="#8b5cf6"
@@ -311,6 +430,10 @@ export default function MonitorCard({
       case 'heatmap':
         return (
           <BarChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+            />
             {data.map((_, index) => (
               <Bar
                 key={index}
@@ -331,6 +454,10 @@ export default function MonitorCard({
                 <stop offset="100%" stopColor="#ef4444" stopOpacity={0.2}/>
               </radialGradient>
             </defs>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#f59e0b', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Area
               type="monotone"
               dataKey="req"
@@ -345,6 +472,10 @@ export default function MonitorCard({
       case 'waterfall':
         return (
           <BarChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+            />
             <Bar
               dataKey="req"
               fill="#06b6d4"
@@ -369,6 +500,10 @@ export default function MonitorCard({
       case 'candlestick':
         return (
           <ComposedChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Bar dataKey="req" fill="#10b981" opacity={0.3} />
             <Line
               type="monotone"
@@ -404,6 +539,10 @@ export default function MonitorCard({
                 </feMerge>
               </filter>
             </defs>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: colors.primary || '#8b5cf6', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Area
               type="monotone"
               dataKey="req"
@@ -427,6 +566,10 @@ export default function MonitorCard({
       default:
         return (
           <LineChart data={data}>
+            <Tooltip
+              {...getTooltipConfig(chartType, monitor.type)}
+              cursor={{ stroke: '#f59e0b', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
             <Line
               type="monotone"
               dataKey="req"
@@ -443,7 +586,7 @@ export default function MonitorCard({
   if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
     return (
       <Card
-        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
+        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size overflow-visible ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
         onClick={handleClick}
       >
         <CardContent className="flex flex-col h-full p-3 relative">
@@ -477,8 +620,8 @@ export default function MonitorCard({
           </div>
 
           {/* Time Series Chart */}
-          <div className="flex-1 mb-1">
-            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
+          <div className="flex-1 mb-1 relative">
+            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2 overflow-visible">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
                   {renderChart()}
