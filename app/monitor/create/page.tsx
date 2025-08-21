@@ -640,7 +640,7 @@ If this does not meet expectations, feel free to suggest improvements.
 
               {/* Enhanced Input Bar */}
               <div className="relative">
-                <div className="flex gap-3 p-4 corner-md border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
+                <div className="flex gap-3 p-4 corner-sm border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}

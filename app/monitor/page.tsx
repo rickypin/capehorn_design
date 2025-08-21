@@ -80,7 +80,7 @@ export default function MonitorListPage() {
                 onClick={handleCreateNew}
               >
                 <CardContent className="flex flex-col items-center justify-center h-48 p-6">
-                  <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 corner-sm bg-muted flex items-center justify-center mb-4">
                     <Plus className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="font-medium text-foreground text-center">Create New Monitor</h3>
