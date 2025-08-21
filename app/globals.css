@@ -337,6 +337,23 @@
   .corner-r-xl-plus { border-top-right-radius: var(--corner-xl-plus); border-bottom-right-radius: var(--corner-xl-plus); }
   .corner-r-2xl { border-top-right-radius: var(--corner-2xl); border-bottom-right-radius: var(--corner-2xl); }
   .corner-r-full { border-top-right-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
+
+  /* Monitor Icon Unified Diagonal Texture System */
+  /* Simple diagonal stripe pattern for all icons */
+
+  .icon-texture-diagonal {
+    position: relative;
+    background:
+      linear-gradient(45deg, transparent 40%, rgba(148, 163, 184, 0.1) 40%, rgba(148, 163, 184, 0.1) 60%, transparent 60%),
+      linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background-size: 8px 8px, 100% 100%;
+  }
+
+  /* Ensure icons appear above texture patterns */
+  .icon-texture-diagonal svg {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Component-specific styles */

@@ -1,7 +1,24 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { MonitorIcon, Activity, TrendingUp } from "lucide-react"
+import {
+  MonitorIcon,
+  Activity,
+  TrendingUp,
+  CreditCard,
+  Database,
+  Server,
+  Zap,
+  Shield,
+  Globe,
+  MessageSquare,
+  HardDrive,
+  Network,
+  BarChart3,
+  Cpu,
+  Cloud,
+  Lock
+} from "lucide-react"
 import {
   LineChart,
   Line,
@@ -128,6 +145,8 @@ export interface MonitorCardData {
   chartType?: ChartType
   // New field for data pattern
   dataPattern?: DataPattern
+  // New field for icon type
+  iconType?: string
   // New fields for visual customization
   chartColors?: {
     primary?: string
@@ -148,6 +167,81 @@ interface MonitorCardProps {
   onClick?: (monitor: MonitorCardData) => void
   className?: string
   showPreview?: boolean
+}
+
+// Icon mapping function to get appropriate icon based on monitor name/type
+function getMonitorIcon(monitor: MonitorCardData) {
+  // If iconType is explicitly set, use it
+  if (monitor.iconType) {
+    switch (monitor.iconType) {
+      case 'credit-card': return CreditCard
+      case 'database': return Database
+      case 'server': return Server
+      case 'zap': return Zap
+      case 'shield': return Shield
+      case 'globe': return Globe
+      case 'message': return MessageSquare
+      case 'storage': return HardDrive
+      case 'network': return Network
+      case 'chart': return BarChart3
+      case 'cpu': return Cpu
+      case 'cloud': return Cloud
+      case 'lock': return Lock
+      case 'activity': return Activity
+      default: return MonitorIcon
+    }
+  }
+
+  // Auto-detect based on monitor name
+  const name = monitor.name.toLowerCase()
+
+  // Payment and financial services
+  if (name.includes('visa') || name.includes('payment') || name.includes('card')) {
+    return CreditCard
+  }
+
+  // Database services
+  if (name.includes('database') || name.includes('db') || name.includes('sql')) {
+    return Database
+  }
+
+  // API and gateway services
+  if (name.includes('api') || name.includes('gateway') || name.includes('service')) {
+    return Server
+  }
+
+  // Load balancer and traffic management
+  if (name.includes('load') || name.includes('balancer') || name.includes('traffic')) {
+    return Zap
+  }
+
+  // Authentication and security
+  if (name.includes('auth') || name.includes('security') || name.includes('login')) {
+    return Shield
+  }
+
+  // Cache services
+  if (name.includes('cache') || name.includes('redis') || name.includes('memory')) {
+    return Cpu
+  }
+
+  // Message queue and communication
+  if (name.includes('message') || name.includes('queue') || name.includes('kafka') || name.includes('rabbit')) {
+    return MessageSquare
+  }
+
+  // File storage and data
+  if (name.includes('file') || name.includes('storage') || name.includes('s3') || name.includes('blob')) {
+    return HardDrive
+  }
+
+  // Network and connectivity
+  if (name.includes('network') || name.includes('cdn') || name.includes('proxy')) {
+    return Network
+  }
+
+  // Default fallback
+  return MonitorIcon
 }
 
 export default function MonitorCard({
@@ -186,15 +280,10 @@ export default function MonitorCard({
     }
   }, [data, monitor.type])
 
-  const getIconColorClass = (iconColor?: string) => {
-    switch (iconColor) {
-      case 'orange':
-        return 'bg-orange-500/10 text-orange-500'
-      case 'blue':
-        return 'bg-primary/10 text-primary'
-      default:
-        return 'bg-primary/10 text-primary'
-    }
+  const getIconStyleClass = (monitor?: MonitorCardData) => {
+    // Unified diagonal texture design system
+    // All icons use the same elegant diagonal stripe pattern
+    return 'bg-slate-50 text-slate-700 border border-slate-200 icon-texture-diagonal'
   }
 
   const getStatusColorClass = (statusColor?: string) => {
@@ -590,16 +679,19 @@ export default function MonitorCard({
         onClick={handleClick}
       >
         <CardContent className="flex flex-col h-full p-3 relative">
-          {/* Test Card Badge - moved to bottom center with subtle styling */}
+          {/* Test Card Badge - text only in bottom margin area */}
           {isTestCard && (
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-600 text-[9px] font-medium px-2 py-1 corner-xs uppercase tracking-wide border border-amber-200 opacity-70">
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-amber-600 text-[10px] font-medium uppercase tracking-wide opacity-60">
               TEST
             </div>
           )}
           {/* Header with Icon and Title */}
           <div className="flex items-start gap-3 mb-2">
-            <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
-              <MonitorIcon className="h-8 w-8" />
+            <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+              {(() => {
+                const IconComponent = getMonitorIcon(monitor)
+                return <IconComponent className="h-6 w-6" />
+              })()}
             </div>
             <div className="flex-1 min-w-0">
               <FadeTitle className="font-medium text-foreground text-sm mb-1">
@@ -670,15 +762,18 @@ export default function MonitorCard({
       onClick={handleClick}
     >
       <CardContent className="flex flex-col h-full p-4 relative">
-        {/* Test Card Badge - moved to bottom center with subtle styling */}
+        {/* Test Card Badge - text only in bottom margin area */}
         {isTestCard && (
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-600 text-[9px] font-medium px-2 py-1 corner-xs uppercase tracking-wide border border-amber-200 opacity-70">
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-amber-600 text-[10px] font-medium uppercase tracking-wide opacity-60">
             TEST
           </div>
         )}
         <div className="flex items-center gap-3 mb-3">
-          <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
-            <MonitorIcon className="h-6 w-6" />
+          <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+            {(() => {
+              const IconComponent = getMonitorIcon(monitor)
+              return <IconComponent className="h-6 w-6" />
+            })()}
           </div>
           <div className="flex-1 min-w-0">
             <FadeTitle className="font-medium text-foreground">
