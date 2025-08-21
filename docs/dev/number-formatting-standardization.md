@@ -42,11 +42,12 @@ Standardized all statistical numbers across the project to consistently display 
 - **calculateNHI()**: Changed from `Math.round()` to `toFixed(2)`
 - **calculateTHI()**: Changed from `Math.round()` to `toFixed(2)`
 
-### 4. **visa_board.jsx**
+### 4. **Legacy Components** (Removed)
 
-#### Health Indicators
-- **NHI Display**: Changed from `maximumFractionDigits: 0` to `minimumFractionDigits: 2, maximumFractionDigits: 2`
-- **THI Display**: Changed from `maximumFractionDigits: 0` to `minimumFractionDigits: 2, maximumFractionDigits: 2`
+#### Previous visa_board.jsx (Now Removed)
+- **NHI Display**: Previously changed from `maximumFractionDigits: 0` to `minimumFractionDigits: 2, maximumFractionDigits: 2`
+- **THI Display**: Previously changed from `maximumFractionDigits: 0` to `minimumFractionDigits: 2, maximumFractionDigits: 2`
+- **Note**: This file has been removed as all functionality was migrated to `VisaPreview.tsx` with proper TypeScript implementation
 
 #### KPI Metrics
 - **Requests**: Added `minimumFractionDigits: 2, maximumFractionDigits: 2` to nfmt call
@@ -126,7 +127,7 @@ After:
 - `components/shared/VisaPreview.tsx`
 - `components/shared/MonitorCard.tsx`
 - `lib/monitor-data.ts`
-- `visa_board.jsx`
+- ~~`visa_board.jsx`~~ (Removed - functionality migrated to VisaPreview.tsx)
 
 ## Testing
 

@@ -96,7 +96,7 @@ The board title headers (containing controls like "VISA Service Performance Moni
 ### ✅ Cross-Page Consistency
 - **`/monitor/visa_service`**: ✅ Fixed header
 - **`/monitor/visa_service_intermediate`**: ✅ Fixed header
-- **`visa_board.jsx`**: ✅ Already had fixed header
+- **~~`visa_board.jsx`~~**: ✅ Previously had fixed header (file now removed)
 
 ## Implementation Notes
 

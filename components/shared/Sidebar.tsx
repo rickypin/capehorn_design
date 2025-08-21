@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Search, BarChart3, Monitor as MonitorIcon, Settings } from "lucide-react"
+import { Search, BarChart3, Monitor as MonitorIcon, Settings, Layers } from "lucide-react"
 
 interface SidebarProps {
   activeNavItem?: string
@@ -26,6 +26,9 @@ export default function Sidebar({
         break
       case "Home":
         router.push("/")
+        break
+      case "CardDemo":
+        router.push("/card-demo")
         break
       default:
         break
@@ -67,6 +70,20 @@ export default function Sidebar({
           title="Monitor"
         >
           <MonitorIcon className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`h-9 w-9 p-0 transition-colors duration-150 ${
+            activeNavItem === "CardDemo"
+              ? "text-primary bg-muted/50 hover:bg-muted/70"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          }`}
+          onClick={() => handleNavItemClick("CardDemo")}
+          title="Card Demo"
+        >
+          <Layers className="h-4 w-4" />
         </Button>
 
         <Button
