@@ -565,17 +565,20 @@ export default function VisaPreview({
           </div>
 
           {/* Layer 1: Transaction Processing Health */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 corner-sm p-6 border border-green-200 dark:border-green-800">
-            <h2 className="text-xl font-semibold mb-4 text-green-900 dark:text-green-100 flex items-center gap-2">
-              <BarChart3 className="h-6 w-6" />
+          <div style={{
+            background: `var(--layer-1-bg)`,
+            borderColor: `var(--layer-1-border)`
+          }} className="corner-sm p-6 border">
+            <h2 style={{ color: `var(--layer-1-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <BarChart3 style={{ color: `var(--layer-1-accent)` }} className="h-6 w-6" />
               Layer 1: Transaction Processing Health
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Transaction KPIs */}
-              <Card className="border-green-200 dark:border-green-700">
+              <Card style={{ borderColor: `var(--layer-1-border)` }} className="border">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    <TrendingUp style={{ color: `var(--layer-1-accent)` }} className="h-5 w-5" />
                     Core Transaction Metrics
                   </CardTitle>
                 </CardHeader>
@@ -640,13 +643,16 @@ export default function VisaPreview({
           </div>
 
           {/* Layer 2: Network Transmission Health */}
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 corner-sm p-6 border border-blue-200 dark:border-blue-800">
-            <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100 flex items-center gap-2">
-              <Wifi className="h-6 w-6" />
+          <div style={{
+            background: `var(--layer-2-bg)`,
+            borderColor: `var(--layer-2-border)`
+          }} className="corner-sm p-6 border">
+            <h2 style={{ color: `var(--layer-2-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Wifi style={{ color: `var(--layer-2-accent)` }} className="h-6 w-6" />
               Layer 2: Network Transmission Health
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Card className="border-blue-200 dark:border-blue-700">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border">
                 <CardHeader>
                   <CardTitle className="text-lg">
                     End-to-End Latency
@@ -708,7 +714,7 @@ export default function VisaPreview({
                 </CardContent>
               </Card>
 
-              <Card className="border-blue-200 dark:border-blue-700">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border">
                 <CardHeader>
                   <CardTitle className="text-lg">
                     Traffic & Connections
@@ -744,14 +750,17 @@ export default function VisaPreview({
           </div>
 
           {/* Layer 3: Cross-Layer Correlation Diagnostics */}
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 corner-sm p-6 border border-purple-200 dark:border-purple-800">
-            <h2 className="text-xl font-semibold mb-4 text-purple-900 dark:text-purple-100 flex items-center gap-2">
-              <Activity className="h-6 w-6" />
+          <div style={{
+            background: `var(--layer-3-bg)`,
+            borderColor: `var(--layer-3-border)`
+          }} className="corner-sm p-6 border">
+            <h2 style={{ color: `var(--layer-3-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Activity style={{ color: `var(--layer-3-accent)` }} className="h-6 w-6" />
               Layer 3: Cross-Layer Correlation Diagnostics
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Success Rate vs Network Latency */}
-              <Card className="border-purple-200 dark:border-purple-700">
+              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border">
                 <CardHeader>
                   <CardTitle className="text-lg">Success Rate vs Network Latency</CardTitle>
                   <div className="text-sm text-muted-foreground">
@@ -787,7 +796,7 @@ export default function VisaPreview({
               </Card>
 
               {/* Packet Loss vs Response Time Bubble Chart */}
-              <Card className="border-purple-200 dark:border-purple-700">
+              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border">
                 <CardHeader>
                   <CardTitle className="text-lg">Packet Loss vs Response Time</CardTitle>
                   <div className="text-sm text-muted-foreground">

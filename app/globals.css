@@ -35,6 +35,28 @@
   --chart-3: #2563eb; /* Color for third data series */
   --chart-4: #1d4ed8; /* Color for fourth data series */
   --chart-5: #1e40af; /* Color for fifth data series */
+
+  /* Monitor Layer Color System - Enhanced Visual Hierarchy */
+  /* Uses neutral tones with subtle color hints for better distinction */
+  /* Avoids red/green/yellow which have monitoring semantics */
+
+  /* Layer 1: Transaction Processing - Warm neutral with subtle amber hint */
+  --layer-1-bg: #fefcf3; /* Warm cream background */
+  --layer-1-border: #f3e8ab; /* Soft golden border */
+  --layer-1-text: #92400e; /* Warm brown text */
+  --layer-1-accent: #d97706; /* Amber accent for icons */
+
+  /* Layer 2: Network Transmission - Cool neutral with subtle slate hint */
+  --layer-2-bg: #f8fafc; /* Cool gray background */
+  --layer-2-border: #cbd5e1; /* Slate border */
+  --layer-2-text: #475569; /* Slate text */
+  --layer-2-accent: #64748b; /* Slate accent for icons */
+
+  /* Layer 3: Cross-Layer Analysis - Neutral with subtle indigo hint */
+  --layer-3-bg: #faf9ff; /* Very light indigo background */
+  --layer-3-border: #e0e7ff; /* Light indigo border */
+  --layer-3-text: #4338ca; /* Indigo text */
+  --layer-3-accent: #6366f1; /* Indigo accent for icons */
   --radius: 0.5rem; /* Corner rounding for cards */
 
   /* New Corner Radius System - Material Design 3 Inspired */
@@ -97,6 +119,26 @@
   --sidebar-accent-foreground: #f1f5f9;
   --sidebar-border: #334155;
   --sidebar-ring: #0ea5e9;
+
+  /* Monitor Layer Color System - Dark mode variants */
+
+  /* Layer 1: Transaction Processing - Dark warm neutral */
+  --layer-1-bg: #1c1917; /* Dark warm background */
+  --layer-1-border: #44403c; /* Warm dark border */
+  --layer-1-text: #fbbf24; /* Warm amber text */
+  --layer-1-accent: #f59e0b; /* Amber accent for icons */
+
+  /* Layer 2: Network Transmission - Dark cool neutral */
+  --layer-2-bg: #0f172a; /* Dark slate background */
+  --layer-2-border: #334155; /* Slate border */
+  --layer-2-text: #94a3b8; /* Cool gray text */
+  --layer-2-accent: #64748b; /* Slate accent for icons */
+
+  /* Layer 3: Cross-Layer Analysis - Dark with indigo hint */
+  --layer-3-bg: #1e1b4b; /* Dark indigo background */
+  --layer-3-border: #3730a3; /* Indigo border */
+  --layer-3-text: #a5b4fc; /* Light indigo text */
+  --layer-3-accent: #6366f1; /* Indigo accent for icons */
 }
 
 @theme inline {
@@ -150,6 +192,20 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Monitor Layer Color System - Tailwind mappings */
+  --color-layer-1-bg: var(--layer-1-bg);
+  --color-layer-1-border: var(--layer-1-border);
+  --color-layer-1-text: var(--layer-1-text);
+  --color-layer-1-accent: var(--layer-1-accent);
+  --color-layer-2-bg: var(--layer-2-bg);
+  --color-layer-2-border: var(--layer-2-border);
+  --color-layer-2-text: var(--layer-2-text);
+  --color-layer-2-accent: var(--layer-2-accent);
+  --color-layer-3-bg: var(--layer-3-bg);
+  --color-layer-3-border: var(--layer-3-border);
+  --color-layer-3-text: var(--layer-3-text);
+  --color-layer-3-accent: var(--layer-3-accent);
 }
 
 @layer base {
