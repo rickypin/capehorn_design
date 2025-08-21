@@ -263,17 +263,47 @@
     border-radius: var(--corner-full);
   }
 
-  /* Corner radius variants for specific sides */
-  .corner-t-none { border-top-left-radius: var(--corner-none); border-top-right-radius: var(--corner-none); }
-  .corner-t-xs { border-top-left-radius: var(--corner-xs); border-top-right-radius: var(--corner-xs); }
-  .corner-t-sm { border-top-left-radius: var(--corner-sm); border-top-right-radius: var(--corner-sm); }
-  .corner-t-md { border-top-left-radius: var(--corner-md); border-top-right-radius: var(--corner-md); }
-  .corner-t-lg { border-top-left-radius: var(--corner-lg); border-top-right-radius: var(--corner-lg); }
-  .corner-t-lg-plus { border-top-left-radius: var(--corner-lg-plus); border-top-right-radius: var(--corner-lg-plus); }
-  .corner-t-xl { border-top-left-radius: var(--corner-xl); border-top-right-radius: var(--corner-xl); }
-  .corner-t-xl-plus { border-top-left-radius: var(--corner-xl-plus); border-top-right-radius: var(--corner-xl-plus); }
-  .corner-t-2xl { border-top-left-radius: var(--corner-2xl); border-top-right-radius: var(--corner-2xl); }
-  .corner-t-full { border-top-left-radius: var(--corner-full); border-top-right-radius: var(--corner-full); }
+  /* Corner radius variants for specific sides - improved formatting */
+  .corner-t-none {
+    border-top-left-radius: var(--corner-none);
+    border-top-right-radius: var(--corner-none);
+  }
+  .corner-t-xs {
+    border-top-left-radius: var(--corner-xs);
+    border-top-right-radius: var(--corner-xs);
+  }
+  .corner-t-sm {
+    border-top-left-radius: var(--corner-sm);
+    border-top-right-radius: var(--corner-sm);
+  }
+  .corner-t-md {
+    border-top-left-radius: var(--corner-md);
+    border-top-right-radius: var(--corner-md);
+  }
+  .corner-t-lg {
+    border-top-left-radius: var(--corner-lg);
+    border-top-right-radius: var(--corner-lg);
+  }
+  .corner-t-lg-plus {
+    border-top-left-radius: var(--corner-lg-plus);
+    border-top-right-radius: var(--corner-lg-plus);
+  }
+  .corner-t-xl {
+    border-top-left-radius: var(--corner-xl);
+    border-top-right-radius: var(--corner-xl);
+  }
+  .corner-t-xl-plus {
+    border-top-left-radius: var(--corner-xl-plus);
+    border-top-right-radius: var(--corner-xl-plus);
+  }
+  .corner-t-2xl {
+    border-top-left-radius: var(--corner-2xl);
+    border-top-right-radius: var(--corner-2xl);
+  }
+  .corner-t-full {
+    border-top-left-radius: var(--corner-full);
+    border-top-right-radius: var(--corner-full);
+  }
 
   .corner-b-none { border-bottom-left-radius: var(--corner-none); border-bottom-right-radius: var(--corner-none); }
   .corner-b-xs { border-bottom-left-radius: var(--corner-xs); border-bottom-right-radius: var(--corner-xs); }
@@ -309,8 +339,9 @@
   .corner-r-full { border-top-right-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
 }
 
-/* Utility: single-line text with gradient fade at right edge */
+/* Component-specific styles */
 @layer components {
+  /* Utility: single-line text with gradient fade at right edge */
   .text-singleline-fade {
     display: block;
     white-space: nowrap;
@@ -321,31 +352,11 @@
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
 
-  /* Scrolling text animation - seamless linear scroll; pause handled in JS */
-  @keyframes scroll-text-seamless {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(var(--scroll-distance, -200px));
-    }
-  }
-
-  .animate-scroll-text {
-    animation-name: scroll-text-seamless;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-fill-mode: none;
-  }
-}
-
-
-/* Component-specific styles */
-@layer components {
-  /* Monitor Card Component */
+  /* CSS 动画相关代码已清理 */
+  /* Monitor Card Component - using rem for better scalability */
   .monitor-card-size {
-    width: 320px;
-    height: 240px;
+    width: 20rem;  /* 320px / 16px = 20rem */
+    height: 15rem; /* 240px / 16px = 15rem */
   }
 
   /* Monitor Grid Layout Component */

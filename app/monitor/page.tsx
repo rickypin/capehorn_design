@@ -40,10 +40,10 @@ export default function MonitorListPage() {
       iconColor: "orange",
       statusColor: "green",
     },
-    // UI Layout Test Cards - 8 additional cards for design testing
+    // UI Layout Test Cards - 8 additional cards for design testing with unique chart types
     {
       id: "test-3",
-      name: "[TEST] Payment Gateway Service with Very Long Title That Should Wrap",
+      name: "[TEST] Payment Gateway Service",
       status: "active",
       lastUpdated: "1 minute ago",
       route: "payment_gateway_test",
@@ -51,7 +51,19 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "blue",
       statusColor: "green",
-      description: "UI Layout Test Card"
+      description: "Gradient Area - Traffic Flow",
+      chartType: "gradient-area",
+      dataPattern: "sawtooth",
+      chartColors: {
+        primary: "#8b5cf6",
+        secondary: "#06b6d4",
+        accent: "#10b981"
+      },
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.8,
+        glow: true
+      }
     },
     {
       id: "test-4",
@@ -63,7 +75,18 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "orange",
       statusColor: "orange",
-      description: "UI Layout Test Card"
+      description: "Multi-Line - Performance Metrics",
+      chartType: "multi-line",
+      dataPattern: "heartbeat",
+      chartColors: {
+        primary: "#f59e0b",
+        secondary: "#ef4444",
+        accent: "#10b981"
+      },
+      chartStyle: {
+        strokeWidth: 2,
+        opacity: 0.9
+      }
     },
     {
       id: "test-5",
@@ -75,7 +98,17 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "blue",
       statusColor: "green",
-      description: "UI Layout Test Card"
+      description: "Stacked Bar - Resource Usage",
+      chartType: "stacked-bar",
+      dataPattern: "exponential",
+      chartColors: {
+        primary: "#3b82f6",
+        secondary: "#f59e0b",
+        accent: "#ef4444"
+      },
+      chartStyle: {
+        opacity: 0.7
+      }
     },
     {
       id: "test-6",
@@ -87,7 +120,17 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "orange",
       statusColor: "red",
-      description: "UI Layout Test Card"
+      description: "Bubble Chart - Correlation",
+      chartType: "bubble",
+      dataPattern: "random-walk",
+      chartColors: {
+        primary: "#8b5cf6",
+        secondary: "#06b6d4",
+        accent: "#f59e0b"
+      },
+      chartStyle: {
+        opacity: 0.6
+      }
     },
     {
       id: "test-7",
@@ -99,7 +142,18 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "blue",
       statusColor: "green",
-      description: "UI Layout Test Card"
+      description: "Radial Gradient - Load Distribution",
+      chartType: "radial",
+      dataPattern: "logarithmic",
+      chartColors: {
+        primary: "#f59e0b",
+        secondary: "#ef4444",
+        accent: "#06b6d4"
+      },
+      chartStyle: {
+        strokeWidth: 2,
+        opacity: 0.8
+      }
     },
     {
       id: "test-8",
@@ -111,7 +165,18 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "orange",
       statusColor: "orange",
-      description: "UI Layout Test Card"
+      description: "Waterfall - Cache Performance",
+      chartType: "waterfall",
+      dataPattern: "cascade",
+      chartColors: {
+        primary: "#06b6d4",
+        secondary: "#10b981",
+        accent: "#ef4444"
+      },
+      chartStyle: {
+        strokeWidth: 1,
+        opacity: 0.9
+      }
     },
     {
       id: "test-9",
@@ -123,7 +188,18 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "blue",
       statusColor: "green",
-      description: "UI Layout Test Card"
+      description: "Candlestick - Queue Metrics",
+      chartType: "candlestick",
+      dataPattern: "oscillating",
+      chartColors: {
+        primary: "#10b981",
+        secondary: "#ef4444",
+        accent: "#06b6d4"
+      },
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.7
+      }
     },
     {
       id: "test-10",
@@ -135,7 +211,19 @@ export default function MonitorListPage() {
       showMetrics: true,
       iconColor: "orange",
       statusColor: "green",
-      description: "UI Layout Test Card"
+      description: "Pulse Wave - Storage Bursts",
+      chartType: "pulse-wave",
+      dataPattern: "pulse-burst",
+      chartColors: {
+        primary: "#8b5cf6",
+        secondary: "#06b6d4",
+        accent: "#10b981"
+      },
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.9,
+        glow: true
+      }
     },
   ]
 

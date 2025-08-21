@@ -2,17 +2,36 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { MonitorIcon, Activity, TrendingUp } from "lucide-react"
-import { LineChart, Line, ResponsiveContainer, Area, AreaChart } from "recharts"
+import {
+  LineChart,
+  Line,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+  BarChart,
+  Bar,
+  ScatterChart,
+  Scatter,
+  ComposedChart,
+  XAxis,
+  YAxis
+} from "recharts"
 import { useMemo, useEffect, useState } from "react"
 import {
   generateMiniCardData,
+  generateMiniCardDataWithPattern,
   calculateNHI,
   calculateTHI,
   getHealthColor,
   getHealthBgColor,
-  type MonitorDataPoint
+  type MonitorDataPoint,
+  type DataPattern
 } from "@/lib/monitor-data"
-import ScrollingTitle from "./ScrollingTitle"
+import FadeTitle from "./FadeTitle"
+
+export type ChartType = 'area' | 'line' | 'bar' | 'scatter' | 'composed' | 'step' |
+  'gradient-area' | 'multi-line' | 'stacked-bar' | 'bubble' | 'heatmap' | 'radial' |
+  'waterfall' | 'candlestick' | 'pulse-wave'
 
 export interface MonitorCardData {
   id: string
@@ -26,6 +45,23 @@ export interface MonitorCardData {
   // New fields for enhanced display
   type?: 'network' | 'transaction'
   showMetrics?: boolean
+  // New field for chart type
+  chartType?: ChartType
+  // New field for data pattern
+  dataPattern?: DataPattern
+  // New fields for visual customization
+  chartColors?: {
+    primary?: string
+    secondary?: string
+    accent?: string
+    gradient?: string[]
+  }
+  chartStyle?: {
+    strokeWidth?: number
+    opacity?: number
+    animation?: boolean
+    glow?: boolean
+  }
 }
 
 interface MonitorCardProps {
@@ -50,8 +86,11 @@ export default function MonitorCard({
   // Generate data for metrics display
   const data = useMemo(() => {
     if (!isClient || !monitor.showMetrics || !monitor.type) return []
+    if (monitor.dataPattern) {
+      return generateMiniCardDataWithPattern(monitor.type, monitor.dataPattern)
+    }
     return generateMiniCardData(monitor.type)
-  }, [isClient, monitor.showMetrics, monitor.type])
+  }, [isClient, monitor.showMetrics, monitor.type, monitor.dataPattern])
 
   const healthIndicator = useMemo(() => {
     if (!data.length || !monitor.type) return null
@@ -101,6 +140,305 @@ export default function MonitorCard({
   // Check if this is a test card
   const isTestCard = monitor.id.startsWith('test-') || monitor.name.includes('[TEST]')
 
+  // Function to render different chart types
+  const renderChart = () => {
+    const chartType = monitor.chartType || (monitor.type === 'network' ? 'area' : 'line')
+    const colors = monitor.chartColors || {
+      primary: monitor.type === 'network' ? '#3b82f6' : '#f59e0b',
+      secondary: '#ef4444',
+      accent: '#10b981'
+    }
+    const style = monitor.chartStyle || { strokeWidth: 2, opacity: 1 }
+
+    switch (chartType) {
+      case 'area':
+        return (
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id={`networkGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={colors.primary} stopOpacity={0.4}/>
+                <stop offset="95%" stopColor={colors.primary} stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <Area
+              type="monotone"
+              dataKey="inMbps"
+              stroke={colors.primary}
+              strokeWidth={style.strokeWidth}
+              fill={`url(#networkGradient-${monitor.id})`}
+              dot={false}
+            />
+          </AreaChart>
+        )
+
+      case 'line':
+        return (
+          <LineChart data={data}>
+            <Line
+              type="monotone"
+              dataKey="req"
+              stroke={colors.primary}
+              strokeWidth={style.strokeWidth}
+              dot={false}
+            />
+          </LineChart>
+        )
+
+      case 'bar':
+        return (
+          <BarChart data={data}>
+            <Bar
+              dataKey="req"
+              fill={colors.primary}
+              radius={[2, 2, 0, 0]}
+              opacity={style.opacity}
+            />
+          </BarChart>
+        )
+
+      case 'scatter':
+        return (
+          <ScatterChart data={data}>
+            <Scatter
+              dataKey="rtt"
+              fill={colors.primary}
+            />
+          </ScatterChart>
+        )
+
+      case 'step':
+        return (
+          <LineChart data={data}>
+            <Line
+              type="stepAfter"
+              dataKey="successRate"
+              stroke={colors.primary}
+              strokeWidth={style.strokeWidth}
+              dot={false}
+            />
+          </LineChart>
+        )
+
+      case 'composed':
+        return (
+          <ComposedChart data={data}>
+            <Bar dataKey="req" fill="#f59e0b" opacity={0.6} />
+            <Line
+              type="monotone"
+              dataKey="rtt"
+              stroke="#ef4444"
+              strokeWidth={2}
+              dot={false}
+            />
+          </ComposedChart>
+        )
+
+      case 'gradient-area':
+        return (
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id={`gradientArea-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.6}/>
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0.2}/>
+              </linearGradient>
+            </defs>
+            <Area
+              type="monotone"
+              dataKey="inMbps"
+              stroke="#8b5cf6"
+              strokeWidth={3}
+              fill={`url(#gradientArea-${monitor.id})`}
+              dot={false}
+            />
+          </AreaChart>
+        )
+
+      case 'multi-line':
+        return (
+          <LineChart data={data}>
+            <Line
+              type="monotone"
+              dataKey="req"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              dot={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="rtt"
+              stroke="#ef4444"
+              strokeWidth={2}
+              dot={false}
+              strokeDasharray="5 5"
+            />
+            <Line
+              type="monotone"
+              dataKey="successRate"
+              stroke="#10b981"
+              strokeWidth={2}
+              dot={false}
+              strokeDasharray="2 2"
+            />
+          </LineChart>
+        )
+
+      case 'stacked-bar':
+        return (
+          <BarChart data={data}>
+            <Bar dataKey="req" stackId="a" fill="#3b82f6" />
+            <Bar dataKey="rtt" stackId="a" fill="#f59e0b" />
+            <Bar dataKey="loss" stackId="a" fill="#ef4444" />
+          </BarChart>
+        )
+
+      case 'bubble':
+        return (
+          <ScatterChart data={data}>
+            <Scatter
+              dataKey="rtt"
+              fill="#8b5cf6"
+              shape="circle"
+            />
+            <Scatter
+              dataKey="req"
+              fill="#06b6d4"
+              shape="circle"
+            />
+          </ScatterChart>
+        )
+
+      case 'heatmap':
+        return (
+          <BarChart data={data}>
+            {data.map((_, index) => (
+              <Bar
+                key={index}
+                dataKey="req"
+                fill={`hsl(${(index * 30) % 360}, 70%, 60%)`}
+                radius={[1, 1, 0, 0]}
+              />
+            ))}
+          </BarChart>
+        )
+
+      case 'radial':
+        return (
+          <AreaChart data={data}>
+            <defs>
+              <radialGradient id={`radialGradient-${monitor.id}`} cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                <stop offset="100%" stopColor="#ef4444" stopOpacity={0.2}/>
+              </radialGradient>
+            </defs>
+            <Area
+              type="monotone"
+              dataKey="req"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              fill={`url(#radialGradient-${monitor.id})`}
+              dot={false}
+            />
+          </AreaChart>
+        )
+
+      case 'waterfall':
+        return (
+          <BarChart data={data}>
+            <Bar
+              dataKey="req"
+              fill="#06b6d4"
+              shape={(props: any) => {
+                const { x, y, width, height } = props
+                return (
+                  <rect
+                    x={x}
+                    y={y}
+                    width={width}
+                    height={height}
+                    fill={height > 20 ? "#10b981" : "#ef4444"}
+                    stroke="#ffffff"
+                    strokeWidth={1}
+                  />
+                )
+              }}
+            />
+          </BarChart>
+        )
+
+      case 'candlestick':
+        return (
+          <ComposedChart data={data}>
+            <Bar dataKey="req" fill="#10b981" opacity={0.3} />
+            <Line
+              type="monotone"
+              dataKey="rtt"
+              stroke="#ef4444"
+              strokeWidth={3}
+              dot={{ fill: "#ef4444", strokeWidth: 2, r: 3 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="successRate"
+              stroke="#06b6d4"
+              strokeWidth={1}
+              dot={false}
+            />
+          </ComposedChart>
+        )
+
+      case 'pulse-wave':
+        return (
+          <ComposedChart data={data}>
+            <defs>
+              <linearGradient id={`pulseGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={colors.primary || "#8b5cf6"} stopOpacity={0.9}/>
+                <stop offset="50%" stopColor={colors.secondary || "#06b6d4"} stopOpacity={0.6}/>
+                <stop offset="100%" stopColor={colors.accent || "#10b981"} stopOpacity={0.1}/>
+              </linearGradient>
+              <filter id={`glow-${monitor.id}`}>
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <Area
+              type="monotone"
+              dataKey="req"
+              stroke={colors.primary || "#8b5cf6"}
+              strokeWidth={style.strokeWidth || 2}
+              fill={`url(#pulseGradient-${monitor.id})`}
+              dot={false}
+              filter={style.glow ? `url(#glow-${monitor.id})` : undefined}
+            />
+            <Line
+              type="monotone"
+              dataKey="rtt"
+              stroke={colors.secondary || "#06b6d4"}
+              strokeWidth={(style.strokeWidth || 2) + 1}
+              dot={{ fill: colors.secondary || "#06b6d4", strokeWidth: 0, r: 2 }}
+              strokeDasharray="3 3"
+            />
+          </ComposedChart>
+        )
+
+      default:
+        return (
+          <LineChart data={data}>
+            <Line
+              type="monotone"
+              dataKey="req"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        )
+    }
+  }
+
   // Render enhanced card with metrics or simple card
   if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
     return (
@@ -121,9 +459,9 @@ export default function MonitorCard({
               <MonitorIcon className="h-8 w-8" />
             </div>
             <div className="flex-1 min-w-0">
-              <ScrollingTitle className="font-medium text-foreground text-sm mb-1">
+              <FadeTitle className="font-medium text-foreground text-sm mb-1">
                 {monitor.name}
-              </ScrollingTitle>
+              </FadeTitle>
               {/* Health Indicator below title */}
               <div className="flex items-center">
                 <div className={`inline-flex items-center px-2 py-1 corner-xs text-xs font-medium ${healthIndicator.bgColor} ${healthIndicator.color}`}>
@@ -143,34 +481,7 @@ export default function MonitorCard({
             <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  {monitor.type === 'network' ? (
-                    <AreaChart data={data}>
-                      <defs>
-                        <linearGradient id={`networkGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
-                        </linearGradient>
-                      </defs>
-                      <Area
-                        type="monotone"
-                        dataKey="inMbps"
-                        stroke="#3b82f6"
-                        strokeWidth={2}
-                        fill={`url(#networkGradient-${monitor.id})`}
-                        dot={false}
-                      />
-                    </AreaChart>
-                  ) : (
-                    <LineChart data={data}>
-                      <Line
-                        type="monotone"
-                        dataKey="req"
-                        stroke="#f59e0b"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  )}
+                  {renderChart()}
                 </ResponsiveContainer>
               ) : (
                 <div className="flex items-center justify-center h-full bg-muted/30 corner-xs">
@@ -227,9 +538,9 @@ export default function MonitorCard({
             <MonitorIcon className="h-6 w-6" />
           </div>
           <div className="flex-1 min-w-0">
-            <ScrollingTitle className="font-medium text-foreground">
+            <FadeTitle className="font-medium text-foreground">
               {monitor.name}
-            </ScrollingTitle>
+            </FadeTitle>
           </div>
         </div>
         <div className="flex-1">
