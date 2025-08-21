@@ -376,6 +376,20 @@
     height: 15rem; /* 240px / 16px = 15rem */
   }
 
+  /* Responsive Monitor Card in Chat - scales down for narrow containers */
+  .chat-layout-responsive .monitor-card-size {
+    width: min(20rem, calc(100% - 2rem)); /* Scale down if container is narrow */
+    height: auto; /* Allow height to adjust proportionally */
+    min-height: 12rem; /* Minimum height to maintain readability */
+    max-width: 20rem; /* Don't exceed original size */
+  }
+
+  /* Extra compact mode for very narrow chat areas */
+  .chat-compact-mode .monitor-card-size {
+    width: min(18rem, calc(100% - 1rem));
+    min-height: 10rem;
+  }
+
   /* Monitor Grid Layout Component */
   .monitor-grid-responsive {
     display: grid;

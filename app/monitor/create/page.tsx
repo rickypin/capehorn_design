@@ -11,6 +11,7 @@ import VisaPreview from "@/components/shared/VisaPreview"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 import Sidebar from "@/components/shared/Sidebar"
 import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
+import { ResizableSplitPane } from "@/components/ui/resizable"
 
 // Message interface for chat functionality
 interface Message {
@@ -144,7 +145,9 @@ export default function NewMonitorPage() {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  const [isCompactLayout, setIsCompactLayout] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   // Monitor card data definitions
   const visaServiceMonitor: MonitorCardData = {
@@ -218,6 +221,49 @@ export default function NewMonitorPage() {
       // Delayed scroll to handle layout transitions
       setTimeout(scrollToBottom, 100)
       setTimeout(scrollToBottom, 300)
+    }
+  }, [showPreview])
+
+  // Responsive chat layout detection
+  useEffect(() => {
+    const checkChatWidth = () => {
+      if (chatContainerRef.current) {
+        const width = chatContainerRef.current.offsetWidth
+        // Switch to compact layout when chat container is <= 400px (25rem)
+        // Increased threshold to account for monitor cards needing more space
+        setIsCompactLayout(width <= 400)
+      }
+    }
+
+    // Only set up observers when in preview mode and element exists
+    if (showPreview && chatContainerRef.current) {
+      // Initial check
+      checkChatWidth()
+
+      // Set up ResizeObserver for precise container size detection
+      let resizeObserver: ResizeObserver | null = null
+      if ('ResizeObserver' in window) {
+        resizeObserver = new ResizeObserver(checkChatWidth)
+        resizeObserver.observe(chatContainerRef.current)
+      }
+
+      // Fallback: window resize listener
+      window.addEventListener('resize', checkChatWidth)
+
+      return () => {
+        window.removeEventListener('resize', checkChatWidth)
+        if (resizeObserver) {
+          resizeObserver.disconnect()
+        }
+      }
+    }
+  }, [showPreview])
+
+  // Additional effect to handle initial layout detection after mount
+  useEffect(() => {
+    if (showPreview && chatContainerRef.current) {
+      const width = chatContainerRef.current.offsetWidth
+      setIsCompactLayout(width <= 400)
     }
   }, [showPreview])
 
@@ -486,12 +532,21 @@ If this does not meet expectations, feel free to suggest improvements.
         {/* Top Navigation Bar with Breadcrumb */}
         <Breadcrumb items={BREADCRUMB_CONFIGS.monitorCreate()} />
 
-        {/* Main Content - Chat Interface or Split Layout */}
+        {/* Main Content - Chat Interface or Resizable Split Layout */}
         <div className="flex-1 flex bg-background overflow-hidden">
           {showPreview ? (
-            <>
-              {/* Chat Area - Improved width for better usability with responsive design */}
-              <div className="w-96 min-w-80 max-w-96 lg:min-w-96 flex flex-col border-r border-border h-full">
+            <ResizableSplitPane
+              defaultLeftWidth={480} // Default 480px to accommodate monitor cards (320px + padding)
+              minLeftWidth={360}     // Minimum 360px
+              maxLeftWidth={800}     // Maximum 800px
+              leftPanel={
+                <div
+                  ref={chatContainerRef}
+                  className={`flex flex-col h-full chat-layout-responsive ${
+                    isCompactLayout ? 'chat-compact-mode' : ''
+                  }`}
+                  title={`Chat Layout: ${isCompactLayout ? 'Compact' : 'Default'}`}
+                >
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   <div className="space-y-4">
@@ -554,14 +609,15 @@ If this does not meet expectations, feel free to suggest improvements.
                     </Button>
                   </div>
                 </div>
-              </div>
-
-              {/* Preview Area - Remaining width with proper overflow handling */}
-              <div className="flex-1 flex flex-col h-full overflow-hidden">
-                {previewType === "visa" && <VisaPreview className="flex-1 overflow-hidden" />}
-                {previewType === "network" && <VisaPreview className="flex-1 overflow-hidden" />}
-              </div>
-            </>
+                </div>
+              }
+              rightPanel={
+                <div className="flex flex-col h-full overflow-hidden">
+                  {previewType === "visa" && <VisaPreview className="flex-1 overflow-hidden" />}
+                  {previewType === "network" && <VisaPreview className="flex-1 overflow-hidden" />}
+                </div>
+              }
+            />
           ) : (
             /* Full Width Chat Interface */
             <div className="flex-1 flex flex-col">
