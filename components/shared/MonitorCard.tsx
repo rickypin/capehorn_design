@@ -107,10 +107,10 @@ export default function MonitorCard({
         <CardContent className="flex flex-col h-64 p-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
+            <div className={`w-10 h-10 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
               <MonitorIcon className="h-5 w-5" />
             </div>
-            <div className={`px-3 py-1.5 rounded-full border text-xs font-semibold ${healthIndicator.bgColor} ${healthIndicator.color} shadow-sm`}>
+            <div className={`px-3 py-1.5 corner-full border text-xs font-semibold ${healthIndicator.bgColor} ${healthIndicator.color} shadow-sm`}>
               {healthIndicator.label}: {healthIndicator.value.toFixed(2)}
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function MonitorCard({
           <div className="mb-3">
             <h3 className="font-medium text-foreground text-sm mb-1">{monitor.name}</h3>
             <div className="flex items-center gap-2">
-              <div className={`w-1.5 h-1.5 rounded-full ${getStatusColorClass(monitor.statusColor)}`}></div>
+              <div className={`w-1.5 h-1.5 corner-full ${getStatusColorClass(monitor.statusColor)}`}></div>
               <span className="text-xs text-muted-foreground capitalize">
                 {showPreview ? 'Preview' : monitor.status}
               </span>
@@ -128,7 +128,7 @@ export default function MonitorCard({
 
           {/* Time Series Chart */}
           <div className="flex-1 mb-2">
-            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 rounded-lg p-2">
+            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
                   {monitor.type === 'network' ? (
@@ -161,7 +161,7 @@ export default function MonitorCard({
                   )}
                 </ResponsiveContainer>
               ) : (
-                <div className="flex items-center justify-center h-full bg-muted/30 rounded">
+                <div className="flex items-center justify-center h-full bg-muted/30 corner-xs">
                   <Activity className="h-4 w-4 text-muted-foreground animate-pulse" />
                 </div>
               )}
@@ -176,7 +176,7 @@ export default function MonitorCard({
                   <Activity className="h-3 w-3" />
                   Network Traffic
                 </span>
-                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 rounded">
+                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 corner-xs">
                   Last 15min
                 </span>
               </div>
@@ -186,7 +186,7 @@ export default function MonitorCard({
                   <TrendingUp className="h-3 w-3" />
                   Transaction Volume
                 </span>
-                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 rounded">
+                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 corner-xs">
                   Last 15min
                 </span>
               </div>
@@ -204,13 +204,13 @@ export default function MonitorCard({
       onClick={handleClick}
     >
       <CardContent className="flex flex-col h-48 p-6">
-        <div className={`w-16 h-16 rounded-lg flex items-center justify-center mb-4 ${getIconColorClass(monitor.iconColor)}`}>
+        <div className={`w-16 h-16 corner-sm flex items-center justify-center mb-4 ${getIconColorClass(monitor.iconColor)}`}>
           <MonitorIcon className="h-8 w-8" />
         </div>
         <div className="flex-1">
           <h3 className="font-medium text-foreground mb-2">{monitor.name}</h3>
           <div className="flex items-center gap-2 mb-2">
-            <div className={`w-2 h-2 rounded-full ${getStatusColorClass(monitor.statusColor)}`}></div>
+            <div className={`w-2 h-2 corner-full ${getStatusColorClass(monitor.statusColor)}`}></div>
             <span className="text-sm text-muted-foreground capitalize">
               {showPreview ? 'Preview' : monitor.status}
             </span>
