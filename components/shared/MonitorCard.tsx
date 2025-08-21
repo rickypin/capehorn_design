@@ -12,6 +12,7 @@ import {
   getHealthBgColor,
   type MonitorDataPoint
 } from "@/lib/monitor-data"
+import ScrollingTitle from "./ScrollingTitle"
 
 export interface MonitorCardData {
   id: string
@@ -104,23 +105,25 @@ export default function MonitorCard({
   if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
     return (
       <Card
-        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-300 bg-amber-50/30' : ''} ${className}`}
+        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
         onClick={handleClick}
       >
         <CardContent className="flex flex-col h-full p-3 relative">
-          {/* Test Card Badge */}
+          {/* Test Card Badge - moved to bottom center with subtle styling */}
           {isTestCard && (
-            <div className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 corner-xs uppercase tracking-wide">
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-600 text-[9px] font-medium px-2 py-1 corner-xs uppercase tracking-wide border border-amber-200 opacity-70">
               TEST
             </div>
           )}
           {/* Header with Icon and Title */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className={`w-10 h-10 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
-              <MonitorIcon className="h-5 w-5" />
+          <div className="flex items-start gap-3 mb-2">
+            <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
+              <MonitorIcon className="h-8 w-8" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-foreground text-sm mb-1">{monitor.name}</h3>
+            <div className="flex-1 min-w-0">
+              <ScrollingTitle className="font-medium text-foreground text-sm mb-1">
+                {monitor.name}
+              </ScrollingTitle>
               {/* Health Indicator below title */}
               <div className="flex items-center">
                 <div className={`inline-flex items-center px-2 py-1 corner-xs text-xs font-medium ${healthIndicator.bgColor} ${healthIndicator.color}`}>
@@ -137,7 +140,7 @@ export default function MonitorCard({
 
           {/* Time Series Chart */}
           <div className="flex-1 mb-1">
-            <div className="h-20 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
+            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
                   {monitor.type === 'network' ? (
@@ -209,13 +212,13 @@ export default function MonitorCard({
   // Fallback to simple card
   return (
     <Card
-      className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-300 bg-amber-50/30' : ''} ${className}`}
+      className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
       onClick={handleClick}
     >
       <CardContent className="flex flex-col h-full p-4 relative">
-        {/* Test Card Badge */}
+        {/* Test Card Badge - moved to bottom center with subtle styling */}
         {isTestCard && (
-          <div className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 corner-xs uppercase tracking-wide">
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-600 text-[9px] font-medium px-2 py-1 corner-xs uppercase tracking-wide border border-amber-200 opacity-70">
             TEST
           </div>
         )}
@@ -223,7 +226,11 @@ export default function MonitorCard({
           <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
             <MonitorIcon className="h-6 w-6" />
           </div>
-          <h3 className="font-medium text-foreground">{monitor.name}</h3>
+          <div className="flex-1 min-w-0">
+            <ScrollingTitle className="font-medium text-foreground">
+              {monitor.name}
+            </ScrollingTitle>
+          </div>
         </div>
         <div className="flex-1">
           <p className="text-xs text-muted-foreground">

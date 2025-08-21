@@ -43,7 +43,7 @@ export default function MonitorListPage() {
     // UI Layout Test Cards - 8 additional cards for design testing
     {
       id: "test-3",
-      name: "[TEST] Payment Gateway",
+      name: "[TEST] Payment Gateway Service with Very Long Title That Should Wrap",
       status: "active",
       lastUpdated: "1 minute ago",
       route: "payment_gateway_test",

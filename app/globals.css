@@ -309,6 +309,37 @@
   .corner-r-full { border-top-right-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
 }
 
+/* Utility: single-line text with gradient fade at right edge */
+@layer components {
+  .text-singleline-fade {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    /* Create a right-edge fade using a gradient mask; WebKit supports mask-image */
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  }
+
+  /* Scrolling text animation - seamless linear scroll; pause handled in JS */
+  @keyframes scroll-text-seamless {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(var(--scroll-distance, -200px));
+    }
+  }
+
+  .animate-scroll-text {
+    animation-name: scroll-text-seamless;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: none;
+  }
+}
+
+
 /* Component-specific styles */
 @layer components {
   /* Monitor Card Component */
