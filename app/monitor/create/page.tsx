@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Send, Bot, User } from "lucide-react"
 import VisaPreview from "@/components/shared/VisaPreview"
+import PreviewHeader from "@/components/shared/PreviewHeader"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 import Sidebar from "@/components/shared/Sidebar"
 import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
@@ -15,7 +16,7 @@ import { ResizableSplitPane } from "@/components/ui/resizable"
 
 // Custom hook for responsive layout detection with proper cleanup
 function useResponsiveLayout(
-  elementRef: React.RefObject<HTMLElement>,
+  elementRef: React.RefObject<HTMLElement | null>,
   threshold: number = 400,
   enabled: boolean = true
 ) {
@@ -177,6 +178,10 @@ export default function NewMonitorPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [previewType, setPreviewType] = useState<string | null>(null)
 
+  // Preview controls state
+  const [isSimulatedData, setIsSimulatedData] = useState(false)
+  const [scenario, setScenario] = useState("normal")
+
   // Chat state management
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -309,6 +314,12 @@ export default function NewMonitorPage() {
   const handleCardClick = (monitor: MonitorCardData) => {
     setShowPreview(true)
     setPreviewType(monitor.id === "visa-service" ? "visa" : "network")
+  }
+
+  // Handle closing the preview
+  const handleClosePreview = () => {
+    setShowPreview(false)
+    setPreviewType(null)
   }
 
   // Handle suggestion chip click
@@ -616,8 +627,32 @@ If this does not meet expectations, feel free to suggest improvements.
               }
               rightPanel={
                 <div className="flex flex-col h-full overflow-hidden">
-                  {previewType === "visa" && <VisaPreview className="flex-1 overflow-hidden" />}
-                  {previewType === "network" && <VisaPreview className="flex-1 overflow-hidden" />}
+                  {/* Preview Header Bar */}
+                  <PreviewHeader
+                    isSimulatedData={isSimulatedData}
+                    onSimulatedDataChange={setIsSimulatedData}
+                    scenario={scenario}
+                    onScenarioChange={setScenario}
+                    onClose={handleClosePreview}
+                  />
+
+                  {/* Preview Content */}
+                  {previewType === "visa" && (
+                    <VisaPreview
+                      className="flex-1 overflow-hidden"
+                      hideDataControls={true}
+                      isSimulatedData={isSimulatedData}
+                      scenario={scenario}
+                    />
+                  )}
+                  {previewType === "network" && (
+                    <VisaPreview
+                      className="flex-1 overflow-hidden"
+                      hideDataControls={true}
+                      isSimulatedData={isSimulatedData}
+                      scenario={scenario}
+                    />
+                  )}
                 </div>
               }
             />

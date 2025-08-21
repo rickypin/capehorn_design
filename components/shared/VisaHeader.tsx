@@ -53,6 +53,7 @@ interface VisaHeaderProps {
   onScenarioChange: (value: string) => void
   badge?: { text: string; color: string } | null
   locale?: string
+  hideDataControls?: boolean // New prop to hide data toggle controls
 }
 
 export default function VisaHeader({
@@ -63,7 +64,8 @@ export default function VisaHeader({
   scenario,
   onScenarioChange,
   badge,
-  locale = "en-US"
+  locale = "en-US",
+  hideDataControls = false
 }: VisaHeaderProps) {
   const [isClient, setIsClient] = useState(false)
 
@@ -84,37 +86,40 @@ export default function VisaHeader({
             {t("title")}
           </h1>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{t("realData")}</span>
-              <Switch
-                checked={isSimulatedData}
-                onCheckedChange={(checked) => {
-                  onSimulatedDataChange(checked)
-                  if (!checked) {
-                    onScenarioChange("normal")
-                  } else {
-                    onScenarioChange("network")
-                  }
-                }}
-              />
-              <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
-            </div>
+          {/* Only show data controls if hideDataControls is false */}
+          {!hideDataControls && (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{t("realData")}</span>
+                <Switch
+                  checked={isSimulatedData}
+                  onCheckedChange={(checked) => {
+                    onSimulatedDataChange(checked)
+                    if (!checked) {
+                      onScenarioChange("normal")
+                    } else {
+                      onScenarioChange("network")
+                    }
+                  }}
+                />
+                <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
+              </div>
 
-            {isSimulatedData && (
-              <Select value={scenario} onValueChange={onScenarioChange}>
-                <SelectTrigger className="w-48 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="network">{t("network_incident")}</SelectItem>
-                  <SelectItem value="app">{t("app_incident")}</SelectItem>
-                  <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
-                  <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          </div>
+              {isSimulatedData && (
+                <Select value={scenario} onValueChange={onScenarioChange}>
+                  <SelectTrigger className="w-48 h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="network">{t("network_incident")}</SelectItem>
+                    <SelectItem value="app">{t("app_incident")}</SelectItem>
+                    <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
+                    <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="ml-auto flex items-center gap-4">

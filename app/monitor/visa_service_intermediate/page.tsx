@@ -36,6 +36,7 @@ export default function VisaServiceIntermediatePage() {
           scenario={scenario}
           onScenarioChange={setScenario}
           badge={null}
+          hideDataControls={true}
         />
 
         {/* VISA Dashboard */}
@@ -43,6 +44,7 @@ export default function VisaServiceIntermediatePage() {
           <VisaPreview
             className="h-full"
             hideHeader={true}
+            hideDataControls={false}
             timeRange={timeRange}
             isSimulatedData={isSimulatedData}
             scenario={scenario}

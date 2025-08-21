@@ -332,6 +332,7 @@ function avg(points: any[], valueKey: string, weightKey: string) {
 interface VisaPreviewProps {
   className?: string
   hideHeader?: boolean
+  hideDataControls?: boolean // New prop to hide only data toggle controls
   timeRange?: string
   isSimulatedData?: boolean
   scenario?: string
@@ -340,6 +341,7 @@ interface VisaPreviewProps {
 export default function VisaPreview({
   className = "",
   hideHeader = false,
+  hideDataControls = false,
   timeRange: externalTimeRange,
   isSimulatedData: externalIsSimulatedData,
   scenario: externalScenario
@@ -403,38 +405,41 @@ export default function VisaPreview({
                   {t("title")}
                 </h1>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{t("realData")}</span>
-                    <Switch
-                      checked={isSimulatedData}
-                      onCheckedChange={(checked) => {
-                        setIsSimulatedData(checked)
-                        if (!checked) {
-                          setScenario("normal")
-                        } else {
-                          // Set default to "network" when switching to simulated data
-                          setScenario("network")
-                        }
-                      }}
-                    />
-                    <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
-                  </div>
+                {/* Only show data controls if hideDataControls is false */}
+                {!hideDataControls && (
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{t("realData")}</span>
+                      <Switch
+                        checked={isSimulatedData}
+                        onCheckedChange={(checked) => {
+                          setIsSimulatedData(checked)
+                          if (!checked) {
+                            setScenario("normal")
+                          } else {
+                            // Set default to "network" when switching to simulated data
+                            setScenario("network")
+                          }
+                        }}
+                      />
+                      <span className="text-sm text-muted-foreground">{t("simulatedData")}</span>
+                    </div>
 
-                  {isSimulatedData && (
-                    <Select value={scenario} onValueChange={setScenario}>
-                      <SelectTrigger className="w-48 h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="network">{t("network_incident")}</SelectItem>
-                        <SelectItem value="app">{t("app_incident")}</SelectItem>
-                        <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
-                        <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
+                    {isSimulatedData && (
+                      <Select value={scenario} onValueChange={setScenario}>
+                        <SelectTrigger className="w-48 h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="network">{t("network_incident")}</SelectItem>
+                          <SelectItem value="app">{t("app_incident")}</SelectItem>
+                          <SelectItem value="crossborder">{t("crossborder_jitter")}</SelectItem>
+                          <SelectItem value="retrans">{t("retrans_storm")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="ml-auto flex items-center gap-4">
@@ -473,7 +478,7 @@ export default function VisaPreview({
         <div className="space-y-6">
           {/* Executive Summary - Health Overview */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 corner-sm p-6 border border-blue-200 dark:border-blue-800">
-            <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">VISA Service Health Overview</h2>
+            <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">Health Overview</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Overall Status - Minimal Modern Design */}
               <div className={`corner-sm p-6 text-center transition-all duration-200 ${
