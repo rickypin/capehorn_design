@@ -13,6 +13,48 @@ import Sidebar from "@/components/shared/Sidebar"
 import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
 import { ResizableSplitPane } from "@/components/ui/resizable"
 
+// Custom hook for responsive layout detection with proper cleanup
+function useResponsiveLayout(
+  elementRef: React.RefObject<HTMLElement>,
+  threshold: number = 400,
+  enabled: boolean = true
+) {
+  const [isCompact, setIsCompact] = useState(false)
+
+  useEffect(() => {
+    const checkWidth = () => {
+      if (elementRef.current) {
+        const width = elementRef.current.offsetWidth
+        setIsCompact(width <= threshold)
+      }
+    }
+
+    if (!enabled || !elementRef.current) return
+
+    // Initial check
+    checkWidth()
+
+    // Set up ResizeObserver for precise container size detection
+    let resizeObserver: ResizeObserver | null = null
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(checkWidth)
+      resizeObserver.observe(elementRef.current)
+    }
+
+    // Fallback: window resize listener
+    window.addEventListener('resize', checkWidth, { passive: true })
+
+    return () => {
+      window.removeEventListener('resize', checkWidth)
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [elementRef, threshold, enabled])
+
+  return isCompact
+}
+
 // Message interface for chat functionality
 interface Message {
   id: string
@@ -145,9 +187,11 @@ export default function NewMonitorPage() {
     },
   ])
   const [inputValue, setInputValue] = useState("")
-  const [isCompactLayout, setIsCompactLayout] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
+
+  // Use custom hook for responsive layout detection
+  const isCompactLayout = useResponsiveLayout(chatContainerRef, 400, showPreview)
 
   // Monitor card data definitions
   const visaServiceMonitor: MonitorCardData = {
@@ -224,48 +268,7 @@ export default function NewMonitorPage() {
     }
   }, [showPreview])
 
-  // Responsive chat layout detection
-  useEffect(() => {
-    const checkChatWidth = () => {
-      if (chatContainerRef.current) {
-        const width = chatContainerRef.current.offsetWidth
-        // Switch to compact layout when chat container is <= 400px (25rem)
-        // Increased threshold to account for monitor cards needing more space
-        setIsCompactLayout(width <= 400)
-      }
-    }
 
-    // Only set up observers when in preview mode and element exists
-    if (showPreview && chatContainerRef.current) {
-      // Initial check
-      checkChatWidth()
-
-      // Set up ResizeObserver for precise container size detection
-      let resizeObserver: ResizeObserver | null = null
-      if ('ResizeObserver' in window) {
-        resizeObserver = new ResizeObserver(checkChatWidth)
-        resizeObserver.observe(chatContainerRef.current)
-      }
-
-      // Fallback: window resize listener
-      window.addEventListener('resize', checkChatWidth)
-
-      return () => {
-        window.removeEventListener('resize', checkChatWidth)
-        if (resizeObserver) {
-          resizeObserver.disconnect()
-        }
-      }
-    }
-  }, [showPreview])
-
-  // Additional effect to handle initial layout detection after mount
-  useEffect(() => {
-    if (showPreview && chatContainerRef.current) {
-      const width = chatContainerRef.current.offsetWidth
-      setIsCompactLayout(width <= 400)
-    }
-  }, [showPreview])
 
   // Handle sending messages
   const handleSendMessage = () => {

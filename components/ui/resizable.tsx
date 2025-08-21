@@ -24,10 +24,10 @@ export function ResizableSplitPane({
   const [isDragging, setIsDragging] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = React.useCallback((e: React.MouseEvent) => {
     setIsDragging(true)
     e.preventDefault()
-  }
+  }, [])
 
   React.useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -50,8 +50,8 @@ export function ResizableSplitPane({
     }
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('mousemove', handleMouseMove, { passive: true })
+      document.addEventListener('mouseup', handleMouseUp, { once: true })
       document.body.style.cursor = 'col-resize'
       document.body.style.userSelect = 'none'
     }
