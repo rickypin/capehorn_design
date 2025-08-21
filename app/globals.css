@@ -308,3 +308,30 @@
   .corner-r-2xl { border-top-right-radius: var(--corner-2xl); border-bottom-right-radius: var(--corner-2xl); }
   .corner-r-full { border-top-right-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
 }
+
+/* Component-specific styles */
+@layer components {
+  /* Monitor Card Component */
+  .monitor-card-size {
+    width: 320px;
+    height: 240px;
+  }
+
+  /* Monitor Grid Layout Component */
+  .monitor-grid-responsive {
+    display: grid;
+    gap: 1rem; /* Use rem units for consistency */
+    justify-content: center;
+
+    /* Dynamic grid columns based on available space */
+    grid-template-columns: repeat(auto-fit, 20rem); /* 320px = 20rem */
+
+    /* Calculate available width: viewport - sidebar - padding */
+    width: calc(100vw - 3rem - 3rem); /* 48px = 3rem */
+    margin: 0 auto;
+
+    /* Ensure minimum spacing from container edges */
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+}

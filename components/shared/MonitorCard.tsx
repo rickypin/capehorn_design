@@ -97,38 +97,47 @@ export default function MonitorCard({
     }
   }
 
+  // Check if this is a test card
+  const isTestCard = monitor.id.startsWith('test-') || monitor.name.includes('[TEST]')
+
   // Render enhanced card with metrics or simple card
   if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
     return (
       <Card
-        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
+        className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-300 bg-amber-50/30' : ''} ${className}`}
         onClick={handleClick}
       >
-        <CardContent className="flex flex-col h-64 p-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
+        <CardContent className="flex flex-col h-full p-3 relative">
+          {/* Test Card Badge */}
+          {isTestCard && (
+            <div className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 corner-xs uppercase tracking-wide">
+              TEST
+            </div>
+          )}
+          {/* Header with Icon and Title */}
+          <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
               <MonitorIcon className="h-5 w-5" />
             </div>
-            <div className={`px-3 py-1.5 corner-full border text-xs font-semibold ${healthIndicator.bgColor} ${healthIndicator.color} shadow-sm`}>
-              {healthIndicator.label}: {healthIndicator.value.toFixed(2)}
-            </div>
-          </div>
-
-          {/* Title and Status */}
-          <div className="mb-3">
-            <h3 className="font-medium text-foreground text-sm mb-1">{monitor.name}</h3>
-            <div className="flex items-center gap-2">
-              <div className={`w-1.5 h-1.5 corner-full ${getStatusColorClass(monitor.statusColor)}`}></div>
-              <span className="text-xs text-muted-foreground capitalize">
-                {showPreview ? 'Preview' : monitor.status}
-              </span>
+            <div className="flex-1">
+              <h3 className="font-medium text-foreground text-sm mb-1">{monitor.name}</h3>
+              {/* Health Indicator below title */}
+              <div className="flex items-center">
+                <div className={`inline-flex items-center px-2 py-1 corner-xs text-xs font-medium ${healthIndicator.bgColor} ${healthIndicator.color}`}>
+                  <span className="text-[10px] font-semibold tracking-wide uppercase opacity-75 mr-1">
+                    {healthIndicator.label}
+                  </span>
+                  <span className="font-bold">
+                    {healthIndicator.value.toFixed(1)}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Time Series Chart */}
-          <div className="flex-1 mb-2">
-            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
+          <div className="flex-1 mb-1">
+            <div className="h-20 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
                   {monitor.type === 'network' ? (
@@ -200,21 +209,23 @@ export default function MonitorCard({
   // Fallback to simple card
   return (
     <Card
-      className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 ${className}`}
+      className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-300 bg-amber-50/30' : ''} ${className}`}
       onClick={handleClick}
     >
-      <CardContent className="flex flex-col h-48 p-6">
-        <div className={`w-16 h-16 corner-sm flex items-center justify-center mb-4 ${getIconColorClass(monitor.iconColor)}`}>
-          <MonitorIcon className="h-8 w-8" />
+      <CardContent className="flex flex-col h-full p-4 relative">
+        {/* Test Card Badge */}
+        {isTestCard && (
+          <div className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 corner-xs uppercase tracking-wide">
+            TEST
+          </div>
+        )}
+        <div className="flex items-center gap-3 mb-3">
+          <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconColorClass(monitor.iconColor)}`}>
+            <MonitorIcon className="h-6 w-6" />
+          </div>
+          <h3 className="font-medium text-foreground">{monitor.name}</h3>
         </div>
         <div className="flex-1">
-          <h3 className="font-medium text-foreground mb-2">{monitor.name}</h3>
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-2 h-2 corner-full ${getStatusColorClass(monitor.statusColor)}`}></div>
-            <span className="text-sm text-muted-foreground capitalize">
-              {showPreview ? 'Preview' : monitor.status}
-            </span>
-          </div>
           <p className="text-xs text-muted-foreground">
             {monitor.description || (monitor.lastUpdated ? `Updated ${monitor.lastUpdated}` : '')}
           </p>
