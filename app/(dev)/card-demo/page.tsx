@@ -178,8 +178,14 @@ export default function CardDemoPage() {
             {sampleMonitors.map((monitor) => (
               <MonitorCard
                 key={monitor.id}
-                monitor={monitor}
-                onClick={(m) => setSelectedCard(`monitor-${m.id}`)}
+                data={monitor}
+                config={{
+                  showPreview: false,
+                  showMetrics: true,
+                  interactive: true
+                }}
+                onSelect={(data) => setSelectedCard(`monitor-${data.id}`)}
+                onNavigate={(route) => console.log(`Navigate to: ${route}`)}
               />
             ))}
           </div>

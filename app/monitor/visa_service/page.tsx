@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import VisaPreview from "@/components/shared/VisaPreview"
 import VisaHeader from "@/components/shared/VisaHeader"
 import Sidebar from "@/components/shared/Sidebar"
-import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
+import Breadcrumb from "@/components/shared/Breadcrumb"
 
 export default function VisaServicePage() {
   const router = useRouter()
@@ -25,7 +25,10 @@ export default function VisaServicePage() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <Breadcrumb items={BREADCRUMB_CONFIGS.visaService()} />
+        <Breadcrumb items={[
+          { label: "Monitor", href: "/monitor" },
+          { label: "VISA Service", isActive: true }
+        ]} />
 
         {/* VISA Header Controls */}
         <VisaHeader

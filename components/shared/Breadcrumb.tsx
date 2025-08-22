@@ -4,22 +4,47 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Home } from "lucide-react"
 
-interface BreadcrumbItem {
+// Unified Props Interface Pattern
+export interface BreadcrumbItem {
+  id?: string
   label: string
   href?: string
   isActive?: boolean
+  icon?: React.ComponentType<{ className?: string }>
 }
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[]
+  onItemClick?: (item: BreadcrumbItem) => void
+  onNavigate?: (href: string) => void
   className?: string
 }
 
-export default function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
+export default function Breadcrumb({
+  items,
+  onItemClick,
+  onNavigate,
+  className = ""
+}: BreadcrumbProps) {
   const router = useRouter()
 
   const handleNavigation = (href: string) => {
-    router.push(href)
+    if (onNavigate) {
+      onNavigate(href)
+    } else {
+      // Default navigation behavior
+      router.push(href)
+    }
+  }
+
+  const handleItemClick = (item: BreadcrumbItem) => {
+    // Call the item click callback
+    onItemClick?.(item)
+
+    // Handle navigation if href is provided
+    if (item.href) {
+      handleNavigation(item.href)
+    }
   }
 
   return (
@@ -38,55 +63,40 @@ export default function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
           </Button>
 
           {/* Breadcrumb Items */}
-          {items.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <span className="text-muted-foreground/70">/</span>
-              {item.href && !item.isActive ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto px-2 py-1 text-foreground font-medium hover:text-primary hover:bg-muted/50 transition-colors duration-150 rounded cursor-pointer"
-                  onClick={() => handleNavigation(item.href!)}
-                >
-                  {item.label}
-                </Button>
-              ) : (
-                <span className={`font-medium px-2 py-1 cursor-default ${
-                  item.isActive
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}>
-                  {item.label}
-                </span>
-              )}
-            </div>
-          ))}
+          {items.map((item, index) => {
+            const ItemIcon = item.icon
+            const itemKey = item.id || `breadcrumb-${index}`
+
+            return (
+              <div key={itemKey} className="flex items-center space-x-2">
+                <span className="text-muted-foreground/70">/</span>
+                {item.href && !item.isActive ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-2 py-1 text-foreground font-medium hover:text-primary hover:bg-muted/50 transition-colors duration-150 rounded cursor-pointer"
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <div className="flex items-center gap-1">
+                      {ItemIcon && <ItemIcon className="h-3 w-3" />}
+                      {item.label}
+                    </div>
+                  </Button>
+                ) : (
+                  <span className={`font-medium px-2 py-1 cursor-default flex items-center gap-1 ${
+                    item.isActive
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  }`}>
+                    {ItemIcon && <ItemIcon className="h-3 w-3" />}
+                    {item.label}
+                  </span>
+                )}
+              </div>
+            )
+          })}
         </nav>
       </div>
     </div>
   )
-}
-
-// Utility function to generate common breadcrumb patterns
-export const createMonitorBreadcrumb = (currentPage?: string): BreadcrumbItem[] => {
-  const items: BreadcrumbItem[] = []
-
-  if (currentPage) {
-    // If there's a current page, Monitor is clickable
-    items.push({ label: "Monitor", href: "/monitor" })
-    items.push({ label: currentPage, isActive: true })
-  } else {
-    // If no current page, Monitor is the current page
-    items.push({ label: "Monitor", isActive: true })
-  }
-
-  return items
-}
-
-// Pre-defined breadcrumb configurations
-export const BREADCRUMB_CONFIGS = {
-  monitor: () => createMonitorBreadcrumb(),
-  monitorCreate: () => createMonitorBreadcrumb("New Monitor"),
-  visaService: () => createMonitorBreadcrumb("VISA Service"),
-  visaServiceIntermediate: () => createMonitorBreadcrumb("VISA Service Performance Monitoring"),
 }

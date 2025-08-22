@@ -11,7 +11,7 @@ import VisaPreview from "@/components/shared/VisaPreview"
 import PreviewHeader from "@/components/shared/PreviewHeader"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 import Sidebar from "@/components/shared/Sidebar"
-import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
+import Breadcrumb from "@/components/shared/Breadcrumb"
 import { ResizableSplitPane } from "@/components/ui/resizable"
 
 // Custom hook for responsive layout detection with proper cleanup
@@ -544,7 +544,10 @@ If this does not meet expectations, feel free to suggest improvements.
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <Breadcrumb items={BREADCRUMB_CONFIGS.monitorCreate()} />
+        <Breadcrumb items={[
+          { label: "Monitor", href: "/monitor" },
+          { label: "New Monitor", isActive: true }
+        ]} />
 
         {/* Main Content - Chat Interface or Resizable Split Layout */}
         <div className="flex-1 flex bg-background overflow-hidden">

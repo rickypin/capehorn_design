@@ -151,10 +151,27 @@ export interface MonitorCardData {
   }
 }
 
+// Unified Props Interface Pattern
+interface MonitorCardConfig {
+  showPreview?: boolean
+  showMetrics?: boolean
+  interactive?: boolean
+}
+
 interface MonitorCardProps {
-  monitor: MonitorCardData
-  onClick?: (monitor: MonitorCardData) => void
+  // New unified interface
+  data: MonitorCardData
+  config?: MonitorCardConfig
+  onSelect?: (data: MonitorCardData) => void
+  onNavigate?: (route: string) => void
   className?: string
+
+  // Legacy interface (deprecated but maintained for backward compatibility)
+  /** @deprecated Use data instead */
+  monitor?: MonitorCardData
+  /** @deprecated Use onSelect instead */
+  onClick?: (monitor: MonitorCardData) => void
+  /** @deprecated Use config.showPreview instead */
   showPreview?: boolean
 }
 
@@ -234,40 +251,80 @@ function getMonitorIcon(monitor: MonitorCardData) {
 }
 
 export default function MonitorCard({
+  // New unified props
+  data,
+  config,
+  onSelect,
+  onNavigate,
+  className = "",
+
+  // Legacy props (deprecated)
   monitor,
   onClick,
-  className = "",
   showPreview = false
 }: MonitorCardProps) {
   const [isClient, setIsClient] = useState(false)
+
+  // Support both new and legacy interfaces
+  const monitorData = data || monitor
+  const cardConfig = config || {}
+  const shouldShowPreview = cardConfig.showPreview ?? showPreview
+
+  // Unified event handler
+  const handleCardClick = () => {
+    if (!monitorData) return
+
+    // New unified interface
+    if (onSelect) {
+      onSelect(monitorData)
+    }
+
+    // Legacy interface support
+    if (onClick) {
+      onClick(monitorData)
+    }
+
+    // Handle navigation
+    if (monitorData.route) {
+      if (onNavigate) {
+        onNavigate(`/monitor/${monitorData.route}`)
+      }
+      // Note: Default navigation is handled by parent components
+    }
+  }
+
+  // Early return if no monitor data
+  if (!monitorData) {
+    return null
+  }
 
   useEffect(() => {
     setIsClient(true)
   }, [])
 
   // Generate data for metrics display
-  const data = useMemo(() => {
-    if (!isClient || !monitor.showMetrics || !monitor.type) return []
-    if (monitor.dataPattern) {
-      return generateMiniCardDataWithPattern(monitor.type, monitor.dataPattern)
+  const chartData = useMemo(() => {
+    if (!isClient || !monitorData.showMetrics || !monitorData.type) return []
+    if (monitorData.dataPattern) {
+      return generateMiniCardDataWithPattern(monitorData.type, monitorData.dataPattern)
     }
-    return generateMiniCardData(monitor.type)
-  }, [isClient, monitor.showMetrics, monitor.type, monitor.dataPattern])
+    return generateMiniCardData(monitorData.type)
+  }, [isClient, monitorData.showMetrics, monitorData.type, monitorData.dataPattern])
 
   const healthIndicator = useMemo(() => {
-    if (!data.length || !monitor.type) return null
+    if (!chartData.length || !monitorData.type) return null
 
-    const value = monitor.type === 'network'
-      ? calculateNHI(data)
-      : calculateTHI(data)
+    const value = monitorData.type === 'network'
+      ? calculateNHI(chartData)
+      : calculateTHI(chartData)
 
     return {
       value,
-      label: monitor.type === 'network' ? 'NHI' : 'THI',
+      label: monitorData.type === 'network' ? 'NHI' : 'THI',
       color: getHealthColor(value),
       bgColor: getHealthBgColor(value)
     }
-  }, [data, monitor.type])
+  }, [chartData, monitorData.type])
 
   const getIconStyleClass = (monitor?: MonitorCardData) => {
     // Unified diagonal texture design system
@@ -288,35 +345,29 @@ export default function MonitorCard({
     }
   }
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick(monitor)
-    }
-  }
-
   // Check if this is a test card
-  const isTestCard = monitor.id.startsWith('test-') || monitor.name.includes('[TEST]')
+  const isTestCard = monitorData.id.startsWith('test-') || monitorData.name.includes('[TEST]')
 
   // Function to render different chart types
   const renderChart = () => {
-    const chartType = monitor.chartType || (monitor.type === 'network' ? 'area' : 'line')
+    const chartType = monitorData.chartType || (monitorData.type === 'network' ? 'area' : 'line')
     // Use design tokens instead of hardcoded colors
-    const colors = monitor.chartColors || getMonitorTypeColors(monitor.type || 'network')
+    const colors = monitorData.chartColors || getMonitorTypeColors(monitorData.type || 'network')
     const uiColors = getChartUIColors()
-    const style = monitor.chartStyle || { strokeWidth: 2, opacity: 1 }
+    const style = monitorData.chartStyle || { strokeWidth: 2, opacity: 1 }
 
     switch (chartType) {
       case 'area':
         return (
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
-              <linearGradient id={`networkGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`networkGradient-${monitorData.id}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={colors.primary} stopOpacity={0.4}/>
                 <stop offset="95%" stopColor={colors.primary} stopOpacity={0.05}/>
               </linearGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -324,7 +375,7 @@ export default function MonitorCard({
               dataKey="inMbps"
               stroke={colors.primary}
               strokeWidth={style.strokeWidth}
-              fill={`url(#networkGradient-${monitor.id})`}
+              fill={`url(#networkGradient-${monitorData.id})`}
               dot={false}
             />
           </AreaChart>
@@ -332,9 +383,9 @@ export default function MonitorCard({
 
       case 'line':
         return (
-          <LineChart data={data}>
+          <LineChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -349,9 +400,9 @@ export default function MonitorCard({
 
       case 'bar':
         return (
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar
@@ -365,9 +416,9 @@ export default function MonitorCard({
 
       case 'scatter':
         return (
-          <ScatterChart data={data}>
+          <ScatterChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ strokeDasharray: '3 3' }}
             />
             <Scatter
@@ -379,9 +430,9 @@ export default function MonitorCard({
 
       case 'step':
         return (
-          <LineChart data={data}>
+          <LineChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -396,9 +447,9 @@ export default function MonitorCard({
 
       case 'composed':
         return (
-          <ComposedChart data={data}>
+          <ComposedChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Bar dataKey="req" fill={colors.primary} opacity={0.6} />
@@ -414,16 +465,16 @@ export default function MonitorCard({
 
       case 'gradient-area':
         return (
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
-              <linearGradient id={`gradientArea-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`gradientArea-${monitorData.id}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={colors.primary} stopOpacity={0.8}/>
                 <stop offset="50%" stopColor={colors.secondary} stopOpacity={0.6}/>
                 <stop offset="100%" stopColor={colors.accent} stopOpacity={0.2}/>
               </linearGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -431,7 +482,7 @@ export default function MonitorCard({
               dataKey="inMbps"
               stroke={colors.primary}
               strokeWidth={3}
-              fill={`url(#gradientArea-${monitor.id})`}
+              fill={`url(#gradientArea-${monitorData.id})`}
               dot={false}
             />
           </AreaChart>
@@ -439,9 +490,9 @@ export default function MonitorCard({
 
       case 'multi-line':
         return (
-          <LineChart data={data}>
+          <LineChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -472,9 +523,9 @@ export default function MonitorCard({
 
       case 'stacked-bar':
         return (
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar dataKey="req" stackId="a" fill={colors.primary} />
@@ -485,9 +536,9 @@ export default function MonitorCard({
 
       case 'bubble':
         return (
-          <ScatterChart data={data}>
+          <ScatterChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ strokeDasharray: '3 3' }}
             />
             <Scatter
@@ -505,9 +556,9 @@ export default function MonitorCard({
 
       case 'heatmap':
         return (
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             {data.map((_, index) => (
@@ -523,15 +574,15 @@ export default function MonitorCard({
 
       case 'radial':
         return (
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
-              <radialGradient id={`radialGradient-${monitor.id}`} cx="50%" cy="50%" r="50%">
+              <radialGradient id={`radialGradient-${monitorData.id}`} cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor={colors.primary} stopOpacity={0.8}/>
                 <stop offset="100%" stopColor={colors.secondary} stopOpacity={0.2}/>
               </radialGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -539,7 +590,7 @@ export default function MonitorCard({
               dataKey="req"
               stroke={colors.primary}
               strokeWidth={2}
-              fill={`url(#radialGradient-${monitor.id})`}
+              fill={`url(#radialGradient-${monitorData.id})`}
               dot={false}
             />
           </AreaChart>
@@ -547,9 +598,9 @@ export default function MonitorCard({
 
       case 'waterfall':
         return (
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar
@@ -575,9 +626,9 @@ export default function MonitorCard({
 
       case 'candlestick':
         return (
-          <ComposedChart data={data}>
+          <ComposedChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Bar dataKey="req" fill={colors.accent} opacity={0.3} />
@@ -600,14 +651,14 @@ export default function MonitorCard({
 
       case 'pulse-wave':
         return (
-          <ComposedChart data={data}>
+          <ComposedChart data={chartData}>
             <defs>
-              <linearGradient id={`pulseGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`pulseGradient-${monitorData.id}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={colors.primary} stopOpacity={0.9}/>
                 <stop offset="50%" stopColor={colors.secondary} stopOpacity={0.6}/>
                 <stop offset="100%" stopColor={colors.accent} stopOpacity={0.1}/>
               </linearGradient>
-              <filter id={`glow-${monitor.id}`}>
+              <filter id={`glow-${monitorData.id}`}>
                 <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                 <feMerge>
                   <feMergeNode in="coloredBlur"/>
@@ -616,7 +667,7 @@ export default function MonitorCard({
               </filter>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -624,9 +675,9 @@ export default function MonitorCard({
               dataKey="req"
               stroke={colors.primary}
               strokeWidth={style.strokeWidth || 2}
-              fill={`url(#pulseGradient-${monitor.id})`}
+              fill={`url(#pulseGradient-${monitorData.id})`}
               dot={false}
-              filter={style.glow ? `url(#glow-${monitor.id})` : undefined}
+              filter={style.glow ? `url(#glow-${monitorData.id})` : undefined}
             />
             <Line
               type="monotone"
@@ -641,9 +692,9 @@ export default function MonitorCard({
 
       default:
         return (
-          <LineChart data={data}>
+          <LineChart data={chartData}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type || 'network')}
+              {...getTooltipConfig(chartType, monitorData.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -659,11 +710,11 @@ export default function MonitorCard({
   }
 
   // Render enhanced card with metrics or simple card
-  if (monitor.showMetrics && monitor.type && data.length > 0 && healthIndicator) {
+  if (monitorData.showMetrics && monitorData.type && chartData.length > 0 && healthIndicator) {
     return (
       <Card
         className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size overflow-visible ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
-        onClick={handleClick}
+        onClick={handleCardClick}
       >
         <CardContent className="flex flex-col h-full p-3 relative">
           {/* Test Card Badge - text only in bottom margin area */}
@@ -674,15 +725,15 @@ export default function MonitorCard({
           )}
           {/* Header with Icon and Title */}
           <div className="flex items-start gap-3 mb-2">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitorData)}`}>
               {(() => {
-                const IconComponent = getMonitorIcon(monitor)
+                const IconComponent = getMonitorIcon(monitorData)
                 return <IconComponent className="h-6 w-6" />
               })()}
             </div>
             <div className="flex-1 min-w-0">
               <FadeTitle className="font-medium text-foreground text-sm mb-1">
-                {monitor.name}
+                {monitorData.name}
               </FadeTitle>
               {/* Health Indicator below title */}
               <div className="flex items-center">
@@ -715,7 +766,7 @@ export default function MonitorCard({
 
           {/* Metrics Summary */}
           <div className="text-xs">
-            {monitor.type === 'network' ? (
+            {monitorData.type === 'network' ? (
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground flex items-center gap-1">
                   <Activity className="h-3 w-3" />
@@ -746,7 +797,7 @@ export default function MonitorCard({
   return (
     <Card
       className={`hover:shadow-lg transition-all duration-200 hover:border-primary/50 monitor-card-size ${isTestCard ? 'border-dashed border-amber-200 bg-amber-50/20' : ''} ${className}`}
-      onClick={handleClick}
+      onClick={handleCardClick}
     >
       <CardContent className="flex flex-col h-full p-4 relative">
         {/* Test Card Badge - text only in bottom margin area */}
@@ -756,21 +807,21 @@ export default function MonitorCard({
           </div>
         )}
         <div className="flex items-center gap-3 mb-3">
-          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitorData)}`}>
             {(() => {
-              const IconComponent = getMonitorIcon(monitor)
+              const IconComponent = getMonitorIcon(monitorData)
               return <IconComponent className="h-6 w-6" />
             })()}
           </div>
           <div className="flex-1 min-w-0">
             <FadeTitle className="font-medium text-foreground">
-              {monitor.name}
+              {monitorData.name}
             </FadeTitle>
           </div>
         </div>
         <div className="flex-1">
           <p className="text-xs text-muted-foreground">
-            {monitor.description || (monitor.lastUpdated ? `Updated ${monitor.lastUpdated}` : '')}
+            {monitorData.description || (monitorData.lastUpdated ? `Updated ${monitorData.lastUpdated}` : '')}
           </p>
         </div>
       </CardContent>

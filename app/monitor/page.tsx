@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
 import Sidebar from "@/components/shared/Sidebar"
-import Breadcrumb, { BREADCRUMB_CONFIGS } from "@/components/shared/Breadcrumb"
+import Breadcrumb from "@/components/shared/Breadcrumb"
 
 export default function MonitorListPage() {
   const router = useRouter()
@@ -218,7 +218,7 @@ export default function MonitorListPage() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <Breadcrumb items={BREADCRUMB_CONFIGS.monitor()} />
+        <Breadcrumb items={[{ label: "Monitor", isActive: true }]} />
 
         {/* Page Content */}
         <div className="flex-1 p-6 overflow-y-auto">
