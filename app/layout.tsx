@@ -10,9 +10,15 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Capehorn Monitor",
-  description: "Network and transaction monitoring dashboard",
+  title: "Capehorn Monitor - Network & Transaction Monitoring Platform",
+  description: "Comprehensive network and transaction monitoring platform for real-time performance insights, health indicators, and proactive issue detection. Monitor your services with advanced analytics and visual dashboards.",
+  keywords: "network monitoring, transaction monitoring, performance analytics, system health, uptime monitoring, real-time metrics",
   generator: "Next.js",
+  openGraph: {
+    title: "Capehorn Monitor - Network & Transaction Monitoring Platform",
+    description: "Comprehensive monitoring platform for real-time performance insights and proactive issue detection.",
+    type: "website",
+  },
 }
 
 export default function RootLayout({

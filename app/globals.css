@@ -36,6 +36,35 @@
   --chart-4: #1d4ed8; /* Color for fourth data series */
   --chart-5: #1e40af; /* Color for fifth data series */
 
+  /* Chart Color System - Semantic Design Tokens */
+  /* Primary chart colors for main data visualization */
+  --chart-primary: #3b82f6; /* Blue - primary data series */
+  --chart-secondary: #06b6d4; /* Cyan - secondary data series */
+  --chart-accent: #10b981; /* Emerald - accent/success data */
+
+  /* Metric-specific semantic colors */
+  --chart-warning: #f59e0b; /* Amber - warning states */
+  --chart-danger: #ef4444; /* Red - error/danger states */
+  --chart-info: #8b5cf6; /* Violet - informational data */
+  --chart-success: #10b981; /* Emerald - success states */
+
+  /* Network monitoring specific colors */
+  --chart-network-inbound: #3b82f6; /* Blue - inbound traffic */
+  --chart-network-outbound: #06b6d4; /* Cyan - outbound traffic */
+  --chart-network-latency: #ef4444; /* Red - latency/RTT */
+  --chart-network-loss: #f59e0b; /* Amber - packet loss */
+
+  /* Transaction monitoring specific colors */
+  --chart-transaction-requests: #f59e0b; /* Amber - request volume */
+  --chart-transaction-success: #10b981; /* Emerald - success rate */
+  --chart-transaction-response: #6366f1; /* Indigo - response time */
+  --chart-transaction-error: #ef4444; /* Red - error rate */
+
+  /* Chart UI elements */
+  --chart-grid: #6b7280; /* Gray - grid lines and cursors */
+  --chart-tooltip-bg: #ffffff; /* White - tooltip background */
+  --chart-tooltip-border: #e5e7eb; /* Light gray - tooltip border */
+
   /* Monitor Layer Color System - Enhanced Visual Hierarchy */
   /* Uses neutral tones with subtle color hints for better distinction */
   /* Avoids red/green/yellow which have monitoring semantics */
@@ -111,6 +140,35 @@
   --chart-3: #2563eb;
   --chart-4: #1d4ed8;
   --chart-5: #1e40af;
+
+  /* Chart Color System - Dark mode variants */
+  /* Primary chart colors for main data visualization */
+  --chart-primary: #60a5fa; /* Lighter blue for dark mode */
+  --chart-secondary: #22d3ee; /* Lighter cyan for dark mode */
+  --chart-accent: #34d399; /* Lighter emerald for dark mode */
+
+  /* Metric-specific semantic colors */
+  --chart-warning: #fbbf24; /* Lighter amber for dark mode */
+  --chart-danger: #f87171; /* Lighter red for dark mode */
+  --chart-info: #a78bfa; /* Lighter violet for dark mode */
+  --chart-success: #34d399; /* Lighter emerald for dark mode */
+
+  /* Network monitoring specific colors */
+  --chart-network-inbound: #60a5fa; /* Lighter blue for dark mode */
+  --chart-network-outbound: #22d3ee; /* Lighter cyan for dark mode */
+  --chart-network-latency: #f87171; /* Lighter red for dark mode */
+  --chart-network-loss: #fbbf24; /* Lighter amber for dark mode */
+
+  /* Transaction monitoring specific colors */
+  --chart-transaction-requests: #fbbf24; /* Lighter amber for dark mode */
+  --chart-transaction-success: #34d399; /* Lighter emerald for dark mode */
+  --chart-transaction-response: #818cf8; /* Lighter indigo for dark mode */
+  --chart-transaction-error: #f87171; /* Lighter red for dark mode */
+
+  /* Chart UI elements */
+  --chart-grid: #9ca3af; /* Lighter gray for dark mode */
+  --chart-tooltip-bg: #1e293b; /* Dark background for tooltip */
+  --chart-tooltip-border: #334155; /* Dark border for tooltip */
   --sidebar: #1e293b;
   --sidebar-foreground: #f1f5f9;
   --sidebar-primary: #0ea5e9;
@@ -166,6 +224,26 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Chart Color System - Tailwind mappings */
+  --color-chart-primary: var(--chart-primary);
+  --color-chart-secondary: var(--chart-secondary);
+  --color-chart-accent: var(--chart-accent);
+  --color-chart-warning: var(--chart-warning);
+  --color-chart-danger: var(--chart-danger);
+  --color-chart-info: var(--chart-info);
+  --color-chart-success: var(--chart-success);
+  --color-chart-network-inbound: var(--chart-network-inbound);
+  --color-chart-network-outbound: var(--chart-network-outbound);
+  --color-chart-network-latency: var(--chart-network-latency);
+  --color-chart-network-loss: var(--chart-network-loss);
+  --color-chart-transaction-requests: var(--chart-transaction-requests);
+  --color-chart-transaction-success: var(--chart-transaction-success);
+  --color-chart-transaction-response: var(--chart-transaction-response);
+  --color-chart-transaction-error: var(--chart-transaction-error);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-tooltip-bg: var(--chart-tooltip-bg);
+  --color-chart-tooltip-border: var(--chart-tooltip-border);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

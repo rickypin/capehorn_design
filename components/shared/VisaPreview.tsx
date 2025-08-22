@@ -515,7 +515,7 @@ export default function VisaPreview({
               </div>
 
               {/* Network Health */}
-              <Card className="border-2 border-blue-200 dark:border-blue-700">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border-2">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -539,7 +539,7 @@ export default function VisaPreview({
               </Card>
 
               {/* Transaction Health */}
-              <Card className="border-2 border-green-200 dark:border-green-700">
+              <Card style={{ borderColor: `var(--layer-1-border)` }} className="border-2">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -575,7 +575,7 @@ export default function VisaPreview({
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Transaction KPIs */}
-              <Card style={{ borderColor: `var(--layer-1-border)` }} className="border">
+              <Card style={{ borderColor: `var(--layer-1-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <TrendingUp style={{ color: `var(--layer-1-accent)` }} className="h-5 w-5" />
@@ -608,7 +608,7 @@ export default function VisaPreview({
               </Card>
 
               {/* Response Code Distribution */}
-              <Card className="border-green-200 dark:border-green-700">
+              <Card style={{ borderColor: `var(--layer-1-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">Response Code Distribution</CardTitle>
                 </CardHeader>
@@ -652,7 +652,7 @@ export default function VisaPreview({
               Layer 2: Network Transmission Health
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">
                     End-to-End Latency
@@ -682,7 +682,7 @@ export default function VisaPreview({
                 </CardContent>
               </Card>
 
-              <Card className="border-blue-200 dark:border-blue-700">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">
                     Packet Loss & Retransmission
@@ -714,7 +714,7 @@ export default function VisaPreview({
                 </CardContent>
               </Card>
 
-              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border">
+              <Card style={{ borderColor: `var(--layer-2-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">
                     Traffic & Connections
@@ -760,7 +760,7 @@ export default function VisaPreview({
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Success Rate vs Network Latency */}
-              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border">
+              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">Success Rate vs Network Latency</CardTitle>
                   <div className="text-sm text-muted-foreground">
@@ -796,7 +796,7 @@ export default function VisaPreview({
               </Card>
 
               {/* Packet Loss vs Response Time Bubble Chart */}
-              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border">
+              <Card style={{ borderColor: `var(--layer-3-border)` }} className="border shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg">Packet Loss vs Response Time</CardTitle>
                   <div className="text-sm text-muted-foreground">

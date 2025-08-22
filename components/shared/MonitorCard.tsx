@@ -45,6 +45,7 @@ import {
   type MonitorDataPoint,
   type DataPattern
 } from "@/lib/monitor-data"
+import { getChartColors, getMonitorTypeColors, getMetricInfo, getChartUIColors } from '@/lib/chart-colors'
 import FadeTitle from "./FadeTitle"
 
 export type ChartType = 'area' | 'line' | 'bar' | 'scatter' | 'composed' | 'step' |
@@ -66,21 +67,9 @@ function CustomTooltip({ active, payload, label, chartType, monitorType }: Custo
   }
 
   // Define metric labels and units based on monitor type and chart type
-  const getMetricInfo = (dataKey: string) => {
-    const metricMap: Record<string, { label: string; unit: string; color?: string }> = {
-      // Network metrics
-      inMbps: { label: 'Inbound Traffic', unit: 'Mbps', color: '#3b82f6' },
-      outMbps: { label: 'Outbound Traffic', unit: 'Mbps', color: '#06b6d4' },
-      rtt: { label: 'Round Trip Time', unit: 'ms', color: '#ef4444' },
-      loss: { label: 'Packet Loss', unit: '%', color: '#f59e0b' },
-      retrans: { label: 'Retransmission', unit: '%', color: '#ef4444' },
-      // Transaction metrics
-      req: { label: 'Requests', unit: '/min', color: '#f59e0b' },
-      successRate: { label: 'Success Rate', unit: '%', color: '#10b981' },
-      respP95: { label: 'Response Time P95', unit: 'ms', color: '#6366f1' },
-      errorRate: { label: 'Error Rate', unit: '%', color: '#ef4444' },
-    }
-    return metricMap[dataKey] || { label: dataKey, unit: '', color: '#6b7280' }
+  // Now using design tokens from chart-colors utility
+  const getMetricInfoLocal = (dataKey: string) => {
+    return getMetricInfo(dataKey)
   }
 
   return (
@@ -92,7 +81,7 @@ function CustomTooltip({ active, payload, label, chartType, monitorType }: Custo
       )}
       <div className="space-y-1">
         {payload.map((entry, index) => {
-          const metricInfo = getMetricInfo(entry.dataKey)
+          const metricInfo = getMetricInfoLocal(entry.dataKey)
           const value = typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value
 
           return (
@@ -311,11 +300,9 @@ export default function MonitorCard({
   // Function to render different chart types
   const renderChart = () => {
     const chartType = monitor.chartType || (monitor.type === 'network' ? 'area' : 'line')
-    const colors = monitor.chartColors || {
-      primary: monitor.type === 'network' ? '#3b82f6' : '#f59e0b',
-      secondary: '#ef4444',
-      accent: '#10b981'
-    }
+    // Use design tokens instead of hardcoded colors
+    const colors = monitor.chartColors || getMonitorTypeColors(monitor.type)
+    const uiColors = getChartUIColors()
     const style = monitor.chartStyle || { strokeWidth: 2, opacity: 1 }
 
     switch (chartType) {
@@ -412,13 +399,13 @@ export default function MonitorCard({
           <ComposedChart data={data}>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
-            <Bar dataKey="req" fill="#f59e0b" opacity={0.6} />
+            <Bar dataKey="req" fill={colors.primary} opacity={0.6} />
             <Line
               type="monotone"
               dataKey="rtt"
-              stroke="#ef4444"
+              stroke={colors.secondary}
               strokeWidth={2}
               dot={false}
             />
@@ -430,19 +417,19 @@ export default function MonitorCard({
           <AreaChart data={data}>
             <defs>
               <linearGradient id={`gradientArea-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.6}/>
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0.2}/>
+                <stop offset="0%" stopColor={colors.primary} stopOpacity={0.8}/>
+                <stop offset="50%" stopColor={colors.secondary} stopOpacity={0.6}/>
+                <stop offset="100%" stopColor={colors.accent} stopOpacity={0.2}/>
               </linearGradient>
             </defs>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
               type="monotone"
               dataKey="inMbps"
-              stroke="#8b5cf6"
+              stroke={colors.primary}
               strokeWidth={3}
               fill={`url(#gradientArea-${monitor.id})`}
               dot={false}
@@ -455,19 +442,19 @@ export default function MonitorCard({
           <LineChart data={data}>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
               type="monotone"
               dataKey="req"
-              stroke="#f59e0b"
+              stroke={colors.primary}
               strokeWidth={2}
               dot={false}
             />
             <Line
               type="monotone"
               dataKey="rtt"
-              stroke="#ef4444"
+              stroke={colors.secondary}
               strokeWidth={2}
               dot={false}
               strokeDasharray="5 5"
@@ -475,7 +462,7 @@ export default function MonitorCard({
             <Line
               type="monotone"
               dataKey="successRate"
-              stroke="#10b981"
+              stroke={colors.accent}
               strokeWidth={2}
               dot={false}
               strokeDasharray="2 2"
@@ -490,9 +477,9 @@ export default function MonitorCard({
               {...getTooltipConfig(chartType, monitor.type)}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
-            <Bar dataKey="req" stackId="a" fill="#3b82f6" />
-            <Bar dataKey="rtt" stackId="a" fill="#f59e0b" />
-            <Bar dataKey="loss" stackId="a" fill="#ef4444" />
+            <Bar dataKey="req" stackId="a" fill={colors.primary} />
+            <Bar dataKey="rtt" stackId="a" fill={colors.secondary} />
+            <Bar dataKey="loss" stackId="a" fill={colors.accent} />
           </BarChart>
         )
 
@@ -505,12 +492,12 @@ export default function MonitorCard({
             />
             <Scatter
               dataKey="rtt"
-              fill="#8b5cf6"
+              fill={colors.primary}
               shape="circle"
             />
             <Scatter
               dataKey="req"
-              fill="#06b6d4"
+              fill={colors.secondary}
               shape="circle"
             />
           </ScatterChart>
@@ -539,18 +526,18 @@ export default function MonitorCard({
           <AreaChart data={data}>
             <defs>
               <radialGradient id={`radialGradient-${monitor.id}`} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                <stop offset="100%" stopColor="#ef4444" stopOpacity={0.2}/>
+                <stop offset="0%" stopColor={colors.primary} stopOpacity={0.8}/>
+                <stop offset="100%" stopColor={colors.secondary} stopOpacity={0.2}/>
               </radialGradient>
             </defs>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#f59e0b', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
               type="monotone"
               dataKey="req"
-              stroke="#f59e0b"
+              stroke={colors.primary}
               strokeWidth={2}
               fill={`url(#radialGradient-${monitor.id})`}
               dot={false}
@@ -567,7 +554,7 @@ export default function MonitorCard({
             />
             <Bar
               dataKey="req"
-              fill="#06b6d4"
+              fill={colors.secondary}
               shape={(props: any) => {
                 const { x, y, width, height } = props
                 return (
@@ -576,7 +563,7 @@ export default function MonitorCard({
                     y={y}
                     width={width}
                     height={height}
-                    fill={height > 20 ? "#10b981" : "#ef4444"}
+                    fill={height > 20 ? colors.accent : uiColors.danger}
                     stroke="#ffffff"
                     strokeWidth={1}
                   />
@@ -591,20 +578,20 @@ export default function MonitorCard({
           <ComposedChart data={data}>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#6b7280', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
-            <Bar dataKey="req" fill="#10b981" opacity={0.3} />
+            <Bar dataKey="req" fill={colors.accent} opacity={0.3} />
             <Line
               type="monotone"
               dataKey="rtt"
-              stroke="#ef4444"
+              stroke={colors.secondary}
               strokeWidth={3}
-              dot={{ fill: "#ef4444", strokeWidth: 2, r: 3 }}
+              dot={{ fill: colors.secondary, strokeWidth: 2, r: 3 }}
             />
             <Line
               type="monotone"
               dataKey="successRate"
-              stroke="#06b6d4"
+              stroke={colors.primary}
               strokeWidth={1}
               dot={false}
             />
@@ -616,9 +603,9 @@ export default function MonitorCard({
           <ComposedChart data={data}>
             <defs>
               <linearGradient id={`pulseGradient-${monitor.id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={colors.primary || "#8b5cf6"} stopOpacity={0.9}/>
-                <stop offset="50%" stopColor={colors.secondary || "#06b6d4"} stopOpacity={0.6}/>
-                <stop offset="100%" stopColor={colors.accent || "#10b981"} stopOpacity={0.1}/>
+                <stop offset="0%" stopColor={colors.primary} stopOpacity={0.9}/>
+                <stop offset="50%" stopColor={colors.secondary} stopOpacity={0.6}/>
+                <stop offset="100%" stopColor={colors.accent} stopOpacity={0.1}/>
               </linearGradient>
               <filter id={`glow-${monitor.id}`}>
                 <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -630,12 +617,12 @@ export default function MonitorCard({
             </defs>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: colors.primary || '#8b5cf6', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
               type="monotone"
               dataKey="req"
-              stroke={colors.primary || "#8b5cf6"}
+              stroke={colors.primary}
               strokeWidth={style.strokeWidth || 2}
               fill={`url(#pulseGradient-${monitor.id})`}
               dot={false}
@@ -644,9 +631,9 @@ export default function MonitorCard({
             <Line
               type="monotone"
               dataKey="rtt"
-              stroke={colors.secondary || "#06b6d4"}
+              stroke={colors.secondary}
               strokeWidth={(style.strokeWidth || 2) + 1}
-              dot={{ fill: colors.secondary || "#06b6d4", strokeWidth: 0, r: 2 }}
+              dot={{ fill: colors.secondary, strokeWidth: 0, r: 2 }}
               strokeDasharray="3 3"
             />
           </ComposedChart>
@@ -657,12 +644,12 @@ export default function MonitorCard({
           <LineChart data={data}>
             <Tooltip
               {...getTooltipConfig(chartType, monitor.type)}
-              cursor={{ stroke: '#f59e0b', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
               type="monotone"
               dataKey="req"
-              stroke="#f59e0b"
+              stroke={colors.primary}
               strokeWidth={2}
               dot={false}
             />

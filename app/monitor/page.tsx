@@ -54,11 +54,7 @@ export default function MonitorListPage() {
       description: "Gradient Area - Traffic Flow",
       chartType: "gradient-area",
       dataPattern: "sawtooth",
-      chartColors: {
-        primary: "#8b5cf6",
-        secondary: "#06b6d4",
-        accent: "#10b981"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 3,
         opacity: 0.8,
@@ -78,11 +74,7 @@ export default function MonitorListPage() {
       description: "Multi-Line - Performance Metrics",
       chartType: "multi-line",
       dataPattern: "heartbeat",
-      chartColors: {
-        primary: "#f59e0b",
-        secondary: "#ef4444",
-        accent: "#10b981"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 2,
         opacity: 0.9
@@ -101,11 +93,7 @@ export default function MonitorListPage() {
       description: "Stacked Bar - Resource Usage",
       chartType: "stacked-bar",
       dataPattern: "exponential",
-      chartColors: {
-        primary: "#3b82f6",
-        secondary: "#f59e0b",
-        accent: "#ef4444"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         opacity: 0.7
       }
@@ -123,11 +111,7 @@ export default function MonitorListPage() {
       description: "Bubble Chart - Correlation",
       chartType: "bubble",
       dataPattern: "random-walk",
-      chartColors: {
-        primary: "#8b5cf6",
-        secondary: "#06b6d4",
-        accent: "#f59e0b"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         opacity: 0.6
       }
@@ -145,11 +129,7 @@ export default function MonitorListPage() {
       description: "Radial Gradient - Load Distribution",
       chartType: "radial",
       dataPattern: "logarithmic",
-      chartColors: {
-        primary: "#f59e0b",
-        secondary: "#ef4444",
-        accent: "#06b6d4"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 2,
         opacity: 0.8
@@ -168,11 +148,7 @@ export default function MonitorListPage() {
       description: "Waterfall - Cache Performance",
       chartType: "waterfall",
       dataPattern: "cascade",
-      chartColors: {
-        primary: "#06b6d4",
-        secondary: "#10b981",
-        accent: "#ef4444"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 1,
         opacity: 0.9
@@ -191,11 +167,7 @@ export default function MonitorListPage() {
       description: "Candlestick - Queue Metrics",
       chartType: "candlestick",
       dataPattern: "oscillating",
-      chartColors: {
-        primary: "#10b981",
-        secondary: "#ef4444",
-        accent: "#06b6d4"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 3,
         opacity: 0.7
@@ -214,11 +186,7 @@ export default function MonitorListPage() {
       description: "Pulse Wave - Storage Bursts",
       chartType: "pulse-wave",
       dataPattern: "pulse-burst",
-      chartColors: {
-        primary: "#8b5cf6",
-        secondary: "#06b6d4",
-        accent: "#10b981"
-      },
+      // chartColors removed - now using design tokens from chart-colors system
       chartStyle: {
         strokeWidth: 3,
         opacity: 0.9,
