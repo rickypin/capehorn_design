@@ -23,70 +23,63 @@ interface CornerExample {
 const cornerExamples: CornerExample[] = [
   {
     name: "None",
-    className: "corner-none",
+    className: "rounded-none",
     description: "No rounding",
     pixelValue: "0px",
     useCase: "Sharp edges, technical interfaces"
   },
   {
-    name: "Extra Small",
-    className: "corner-xs",
+    name: "Small",
+    className: "rounded-sm",
     description: "Minimal rounding",
-    pixelValue: "4px",
+    pixelValue: "2px",
     useCase: "Small buttons, input fields"
   },
   {
-    name: "Small",
-    className: "corner-sm",
+    name: "Default",
+    className: "rounded",
     description: "Subtle rounding",
-    pixelValue: "8px",
+    pixelValue: "4px",
     useCase: "Standard buttons, form elements"
   },
   {
     name: "Medium",
-    className: "corner-md",
+    className: "rounded-md",
     description: "Moderate rounding",
-    pixelValue: "12px",
+    pixelValue: "6px",
     useCase: "Cards, panels, chips"
   },
   {
     name: "Large",
-    className: "corner-lg",
-    description: "Base rounding (configurable)",
-    pixelValue: "16px",
+    className: "rounded-lg",
+    description: "Base rounding",
+    pixelValue: "8px",
     useCase: "Main cards, containers"
   },
   {
-    name: "Large Plus",
-    className: "corner-lg-plus",
+    name: "Extra Large",
+    className: "rounded-xl",
     description: "Enhanced rounding",
-    pixelValue: "20px",
+    pixelValue: "12px",
     useCase: "Featured cards, call-to-action"
   },
   {
-    name: "Extra Large",
-    className: "corner-xl",
+    name: "2X Large",
+    className: "rounded-2xl",
     description: "Prominent rounding",
-    pixelValue: "28px",
+    pixelValue: "16px",
     useCase: "Hero sections, large cards"
   },
   {
-    name: "Extra Large Plus",
-    className: "corner-xl-plus",
+    name: "3X Large",
+    className: "rounded-3xl",
     description: "Strong rounding",
-    pixelValue: "32px",
+    pixelValue: "24px",
     useCase: "Modal dialogs, overlays"
   },
   {
-    name: "Extra Extra Large",
-    className: "corner-2xl",
-    description: "Maximum rounding",
-    pixelValue: "48px",
-    useCase: "Hero sections, landing pages"
-  },
-  {
     name: "Full",
-    className: "corner-full",
+    className: "rounded-full",
     description: "Fully rounded",
     pixelValue: "∞",
     useCase: "Avatars, badges, pills"
@@ -94,23 +87,23 @@ const cornerExamples: CornerExample[] = [
 ]
 
 const directionalExamples = [
-  { name: "Top Only", className: "corner-t-lg corner-b-none", description: "Header sections" },
-  { name: "Bottom Only", className: "corner-b-lg corner-t-none", description: "Footer sections" },
-  { name: "Left Only", className: "corner-l-lg corner-r-none", description: "Sidebar panels" },
-  { name: "Right Only", className: "corner-r-lg corner-l-none", description: "Content panels" }
+  { name: "Top Only", className: "rounded-t-lg", description: "Header sections" },
+  { name: "Bottom Only", className: "rounded-b-lg", description: "Footer sections" },
+  { name: "Left Only", className: "rounded-l-lg", description: "Sidebar panels" },
+  { name: "Right Only", className: "rounded-r-lg", description: "Content panels" }
 ]
 
 export default function CornerRadiusDemo() {
-  const [selectedCorner, setSelectedCorner] = useState("corner-lg")
+  const [selectedCorner, setSelectedCorner] = useState("rounded-lg")
   const [showDirectional, setShowDirectional] = useState(false)
 
   return (
     <div className="p-6 space-y-8">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Corner Radius System Demo</h1>
+        <h1 className="text-3xl font-bold">Tailwind Rounded Classes Demo</h1>
         <p className="text-muted-foreground">
-          Explore the new corner radius system with Material Design 3 inspired scaling
+          Explore Tailwind CSS rounded classes for consistent corner radius styling
         </p>
       </div>
 
@@ -119,14 +112,14 @@ export default function CornerRadiusDemo() {
         <Button
           variant={!showDirectional ? "default" : "outline"}
           onClick={() => setShowDirectional(false)}
-          className="corner-md"
+          className="rounded-xl"
         >
           All Corners
         </Button>
         <Button
           variant={showDirectional ? "default" : "outline"}
           onClick={() => setShowDirectional(true)}
-          className="corner-md"
+          className="rounded-xl"
         >
           Directional Corners
         </Button>
@@ -145,7 +138,7 @@ export default function CornerRadiusDemo() {
             >
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">{example.name}</CardTitle>
-                <Badge variant="outline" className="w-fit corner-sm">
+                <Badge variant="outline" className="w-fit rounded-lg">
                   {example.pixelValue}
                 </Badge>
               </CardHeader>
@@ -187,7 +180,7 @@ export default function CornerRadiusDemo() {
       )}
 
       {/* Interactive Preview */}
-      <Card className="corner-lg">
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Interactive Preview</CardTitle>
           <p className="text-muted-foreground">
@@ -199,32 +192,35 @@ export default function CornerRadiusDemo() {
             <div className="text-center space-y-4">
               <h3 className="text-xl font-semibold">Preview Card</h3>
               <p className="text-muted-foreground">
-                This card is using: <code className="corner-sm bg-muted px-2 py-1 text-sm">{selectedCorner}</code>
+                This card is using: <code className="rounded-lg bg-muted px-2 py-1 text-sm">{selectedCorner}</code>
               </p>
               <div className="flex gap-2 justify-center flex-wrap">
-                <Button className="corner-sm">Small Button</Button>
-                <Button className="corner-md">Medium Button</Button>
-                <Button className="corner-lg">Large Button</Button>
+                <Button className="rounded-lg">Small Button</Button>
+                <Button className="rounded-xl">Medium Button</Button>
+                <Button className="rounded-2xl">Large Button</Button>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* System Comparison */}
-      <Card className="corner-lg">
+      {/* Tailwind Rounded Classes */}
+      <Card className="rounded-2xl">
         <CardHeader>
-          <CardTitle>System Comparison</CardTitle>
+          <CardTitle>Tailwind Rounded Classes</CardTitle>
           <p className="text-muted-foreground">
-            Legacy vs New Corner Radius Systems
+            Standard Tailwind CSS rounded utility classes
           </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Legacy System */}
+            {/* Basic Rounded Classes */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-lg">Legacy System</h4>
+              <h4 className="font-semibold text-lg">Basic Classes</h4>
               <div className="space-y-3">
+                <div className="rounded-none bg-muted p-3">
+                  <code>rounded-none</code> - 0px
+                </div>
                 <div className="rounded-sm bg-muted p-3">
                   <code>rounded-sm</code> - 2px
                 </div>
@@ -237,30 +233,24 @@ export default function CornerRadiusDemo() {
                 <div className="rounded-lg bg-muted p-3">
                   <code>rounded-lg</code> - 8px
                 </div>
-                <div className="rounded-xl bg-muted p-3">
-                  <code>rounded-xl</code> - 12px
-                </div>
               </div>
             </div>
 
-            {/* New System */}
+            {/* Extended Classes */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-lg">New Corner System</h4>
+              <h4 className="font-semibold text-lg">Extended Classes</h4>
               <div className="space-y-3">
-                <div className="corner-xs bg-muted p-3">
-                  <code>corner-xs</code> - 4px
+                <div className="rounded-xl bg-muted p-3">
+                  <code>rounded-xl</code> - 12px
                 </div>
-                <div className="corner-sm bg-muted p-3">
-                  <code>corner-sm</code> - 8px
+                <div className="rounded-2xl bg-muted p-3">
+                  <code>rounded-2xl</code> - 16px
                 </div>
-                <div className="corner-md bg-muted p-3">
-                  <code>corner-md</code> - 12px
+                <div className="rounded-3xl bg-muted p-3">
+                  <code>rounded-3xl</code> - 24px
                 </div>
-                <div className="corner-lg bg-muted p-3">
-                  <code>corner-lg</code> - 16px (base)
-                </div>
-                <div className="corner-xl bg-muted p-3">
-                  <code>corner-xl</code> - 28px
+                <div className="rounded-full bg-muted p-3">
+                  <code>rounded-full</code> - ∞
                 </div>
               </div>
             </div>
@@ -268,30 +258,36 @@ export default function CornerRadiusDemo() {
         </CardContent>
       </Card>
 
-      {/* Configuration Example */}
-      <Card className="corner-lg">
+      {/* Usage Examples */}
+      <Card className="rounded-2xl">
         <CardHeader>
-          <CardTitle>Configuration</CardTitle>
+          <CardTitle>Usage Examples</CardTitle>
           <p className="text-muted-foreground">
-            Customize the base corner radius value
+            How to use Tailwind rounded classes in your components
           </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="corner-md bg-muted p-4">
-              <h4 className="font-semibold mb-2">CSS Variable Configuration</h4>
+            <div className="rounded-xl bg-muted p-4">
+              <h4 className="font-semibold mb-2">Component Examples</h4>
               <pre className="text-sm overflow-x-auto">
-{`:root {
-  --corner-base: 1rem; /* 16px - Default */
-  /* or */
-  --corner-base: 1.25rem; /* 20px - Larger */
-  /* or */
-  --corner-base: 0.75rem; /* 12px - Smaller */
-}`}
+{`// Button with rounded corners
+<Button className="rounded">Click me</Button>
+
+// Card with large rounded corners
+<Card className="rounded-lg">Content</Card>
+
+// Avatar with full rounding
+<div className="rounded-full">Avatar</div>
+
+// Custom rounded corners
+<div className="rounded-t-lg rounded-b-none">
+  Header with top corners only
+</div>`}
               </pre>
             </div>
             <p className="text-sm text-muted-foreground">
-              Changing <code>--corner-base</code> automatically scales all related corner sizes while maintaining proportional relationships.
+              Use Tailwind's standard rounded classes for consistent corner radius styling across your application.
             </p>
           </div>
         </CardContent>

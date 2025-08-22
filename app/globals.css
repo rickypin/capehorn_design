@@ -88,21 +88,7 @@
   --layer-3-accent: #6366f1; /* Indigo accent for icons */
   --radius: 0.5rem; /* Corner rounding for cards */
 
-  /* New Corner Radius System - Material Design 3 Inspired */
-  /* Prefix: 'corner-' to distinguish from legacy 'radius-' system */
-  --corner-base: 1rem; /* 16px - User configurable base value (Large) */
 
-  /* Complete corner radius scale */
-  --corner-none: 0;                                      /* 0dp - No rounding */
-  --corner-xs: 0.25rem;                                 /* 4dp - Extra small */
-  --corner-sm: 0.5rem;                                  /* 8dp - Small */
-  --corner-md: 0.75rem;                                 /* 12dp - Medium */
-  --corner-lg: var(--corner-base);                      /* 16dp - Large (base) */
-  --corner-lg-plus: calc(var(--corner-base) + 0.25rem); /* 20dp - Large increased */
-  --corner-xl: calc(var(--corner-base) + 0.75rem);      /* 28dp - Extra large */
-  --corner-xl-plus: calc(var(--corner-base) + 1rem);    /* 32dp - Extra large increased */
-  --corner-2xl: calc(var(--corner-base) + 2rem);        /* 48dp - Extra extra large */
-  --corner-full: 9999px;                                /* Fully rounded corners */
 
   --sidebar: #ffffff; /* Background for sidebar */
   --sidebar-foreground: #4b5563; /* Text color for sidebar */
@@ -249,18 +235,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* New Corner Radius System - Tailwind Class Mappings */
-  /* Use 'corner-' prefix for new system classes */
-  --corner-none: var(--corner-none);
-  --corner-xs: var(--corner-xs);
-  --corner-sm: var(--corner-sm);
-  --corner-md: var(--corner-md);
-  --corner-lg: var(--corner-lg);
-  --corner-lg-plus: var(--corner-lg-plus);
-  --corner-xl: var(--corner-xl);
-  --corner-xl-plus: var(--corner-xl-plus);
-  --corner-2xl: var(--corner-2xl);
-  --corner-full: var(--corner-full);
+
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -355,122 +330,9 @@
     @apply cursor-default;
   }
 
-  /* New Corner Radius System - Utility Classes */
-  /* Use 'corner-' prefix to distinguish from legacy 'rounded-' classes */
-  .corner-none {
-    border-radius: var(--corner-none);
-  }
 
-  .corner-xs {
-    border-radius: var(--corner-xs);
-  }
 
-  .corner-sm {
-    border-radius: var(--corner-sm);
-  }
 
-  .corner-md {
-    border-radius: var(--corner-md);
-  }
-
-  .corner-lg {
-    border-radius: var(--corner-lg);
-  }
-
-  .corner-lg-plus {
-    border-radius: var(--corner-lg-plus);
-  }
-
-  .corner-xl {
-    border-radius: var(--corner-xl);
-  }
-
-  .corner-xl-plus {
-    border-radius: var(--corner-xl-plus);
-  }
-
-  .corner-2xl {
-    border-radius: var(--corner-2xl);
-  }
-
-  .corner-full {
-    border-radius: var(--corner-full);
-  }
-
-  /* Corner radius variants for specific sides - improved formatting */
-  .corner-t-none {
-    border-top-left-radius: var(--corner-none);
-    border-top-right-radius: var(--corner-none);
-  }
-  .corner-t-xs {
-    border-top-left-radius: var(--corner-xs);
-    border-top-right-radius: var(--corner-xs);
-  }
-  .corner-t-sm {
-    border-top-left-radius: var(--corner-sm);
-    border-top-right-radius: var(--corner-sm);
-  }
-  .corner-t-md {
-    border-top-left-radius: var(--corner-md);
-    border-top-right-radius: var(--corner-md);
-  }
-  .corner-t-lg {
-    border-top-left-radius: var(--corner-lg);
-    border-top-right-radius: var(--corner-lg);
-  }
-  .corner-t-lg-plus {
-    border-top-left-radius: var(--corner-lg-plus);
-    border-top-right-radius: var(--corner-lg-plus);
-  }
-  .corner-t-xl {
-    border-top-left-radius: var(--corner-xl);
-    border-top-right-radius: var(--corner-xl);
-  }
-  .corner-t-xl-plus {
-    border-top-left-radius: var(--corner-xl-plus);
-    border-top-right-radius: var(--corner-xl-plus);
-  }
-  .corner-t-2xl {
-    border-top-left-radius: var(--corner-2xl);
-    border-top-right-radius: var(--corner-2xl);
-  }
-  .corner-t-full {
-    border-top-left-radius: var(--corner-full);
-    border-top-right-radius: var(--corner-full);
-  }
-
-  .corner-b-none { border-bottom-left-radius: var(--corner-none); border-bottom-right-radius: var(--corner-none); }
-  .corner-b-xs { border-bottom-left-radius: var(--corner-xs); border-bottom-right-radius: var(--corner-xs); }
-  .corner-b-sm { border-bottom-left-radius: var(--corner-sm); border-bottom-right-radius: var(--corner-sm); }
-  .corner-b-md { border-bottom-left-radius: var(--corner-md); border-bottom-right-radius: var(--corner-md); }
-  .corner-b-lg { border-bottom-left-radius: var(--corner-lg); border-bottom-right-radius: var(--corner-lg); }
-  .corner-b-lg-plus { border-bottom-left-radius: var(--corner-lg-plus); border-bottom-right-radius: var(--corner-lg-plus); }
-  .corner-b-xl { border-bottom-left-radius: var(--corner-xl); border-bottom-right-radius: var(--corner-xl); }
-  .corner-b-xl-plus { border-bottom-left-radius: var(--corner-xl-plus); border-bottom-right-radius: var(--corner-xl-plus); }
-  .corner-b-2xl { border-bottom-left-radius: var(--corner-2xl); border-bottom-right-radius: var(--corner-2xl); }
-  .corner-b-full { border-bottom-left-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
-
-  .corner-l-none { border-top-left-radius: var(--corner-none); border-bottom-left-radius: var(--corner-none); }
-  .corner-l-xs { border-top-left-radius: var(--corner-xs); border-bottom-left-radius: var(--corner-xs); }
-  .corner-l-sm { border-top-left-radius: var(--corner-sm); border-bottom-left-radius: var(--corner-sm); }
-  .corner-l-md { border-top-left-radius: var(--corner-md); border-bottom-left-radius: var(--corner-md); }
-  .corner-l-lg { border-top-left-radius: var(--corner-lg); border-bottom-left-radius: var(--corner-lg); }
-  .corner-l-lg-plus { border-top-left-radius: var(--corner-lg-plus); border-bottom-left-radius: var(--corner-lg-plus); }
-  .corner-l-xl { border-top-left-radius: var(--corner-xl); border-bottom-left-radius: var(--corner-xl); }
-  .corner-l-xl-plus { border-top-left-radius: var(--corner-xl-plus); border-bottom-left-radius: var(--corner-xl-plus); }
-  .corner-l-2xl { border-top-left-radius: var(--corner-2xl); border-bottom-left-radius: var(--corner-2xl); }
-  .corner-l-full { border-top-left-radius: var(--corner-full); border-bottom-left-radius: var(--corner-full); }
-
-  .corner-r-none { border-top-right-radius: var(--corner-none); border-bottom-right-radius: var(--corner-none); }
-  .corner-r-xs { border-top-right-radius: var(--corner-xs); border-bottom-right-radius: var(--corner-xs); }
-  .corner-r-sm { border-top-right-radius: var(--corner-sm); border-bottom-right-radius: var(--corner-sm); }
-  .corner-r-md { border-top-right-radius: var(--corner-md); border-bottom-right-radius: var(--corner-md); }
-  .corner-r-lg { border-top-right-radius: var(--corner-lg); border-bottom-right-radius: var(--corner-lg); }
-  .corner-r-lg-plus { border-top-right-radius: var(--corner-lg-plus); border-bottom-right-radius: var(--corner-lg-plus); }
-  .corner-r-xl { border-top-right-radius: var(--corner-xl); border-bottom-right-radius: var(--corner-xl); }
-  .corner-r-xl-plus { border-top-right-radius: var(--corner-xl-plus); border-bottom-right-radius: var(--corner-xl-plus); }
-  .corner-r-2xl { border-top-right-radius: var(--corner-2xl); border-bottom-right-radius: var(--corner-2xl); }
-  .corner-r-full { border-top-right-radius: var(--corner-full); border-bottom-right-radius: var(--corner-full); }
 
   /* Monitor Icon Unified Diagonal Texture System */
   /* Simple diagonal stripe pattern for all icons */

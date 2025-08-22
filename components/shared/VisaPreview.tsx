@@ -477,16 +477,16 @@ export default function VisaPreview({
       <div className="flex-1 overflow-y-auto p-6">
         <div className="space-y-6">
           {/* Executive Summary - Health Overview */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 corner-sm p-6 border border-blue-200 dark:border-blue-800">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
             <h2 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">Health Overview</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Overall Status - Minimal Modern Design */}
-              <div className={`corner-sm p-6 text-center transition-all duration-200 ${
+              <div className={`rounded-lg p-6 text-center transition-all duration-200 ${
                 Math.min(nhi, thi) >= 80 ? "bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800" :
                 Math.min(nhi, thi) >= 60 ? "bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800" :
                 "bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800"
               }`}>
-                <div className={`w-16 h-16 mx-auto mb-4 corner-full flex items-center justify-center ${
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
                   Math.min(nhi, thi) >= 80 ? "bg-emerald-100 dark:bg-emerald-900/50" :
                   Math.min(nhi, thi) >= 60 ? "bg-amber-100 dark:bg-amber-900/50" :
                   "bg-red-100 dark:bg-red-900/50"
@@ -527,7 +527,7 @@ export default function VisaPreview({
                     </span>
                   </div>
                   <Progress value={nhi} className="h-2 mb-2" />
-                  <span className={`text-xs font-medium px-2 py-1 corner-xs ${
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${
                     healthColor(nhi) === "green" ? "bg-emerald-100 text-emerald-700" :
                     healthColor(nhi) === "orange" ? "bg-amber-100 text-amber-700" :
                     "bg-red-100 text-red-700"
@@ -551,7 +551,7 @@ export default function VisaPreview({
                     </span>
                   </div>
                   <Progress value={thi} className="h-2 mb-2" />
-                  <span className={`text-xs font-medium px-2 py-1 corner-xs ${
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${
                     healthColor(thi) === "green" ? "bg-emerald-100 text-emerald-700" :
                     healthColor(thi) === "orange" ? "bg-amber-100 text-amber-700" :
                     "bg-red-100 text-red-700"
@@ -568,7 +568,7 @@ export default function VisaPreview({
           <div style={{
             background: `var(--layer-1-bg)`,
             borderColor: `var(--layer-1-border)`
-          }} className="corner-sm p-6 border">
+          }} className="rounded-lg p-6 border">
             <h2 style={{ color: `var(--layer-1-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
               <BarChart3 style={{ color: `var(--layer-1-accent)` }} className="h-6 w-6" />
               Layer 1: Transaction Processing Health
@@ -646,7 +646,7 @@ export default function VisaPreview({
           <div style={{
             background: `var(--layer-2-bg)`,
             borderColor: `var(--layer-2-border)`
-          }} className="corner-sm p-6 border">
+          }} className="rounded-lg p-6 border">
             <h2 style={{ color: `var(--layer-2-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Wifi style={{ color: `var(--layer-2-accent)` }} className="h-6 w-6" />
               Layer 2: Network Transmission Health
@@ -753,7 +753,7 @@ export default function VisaPreview({
           <div style={{
             background: `var(--layer-3-bg)`,
             borderColor: `var(--layer-3-border)`
-          }} className="corner-sm p-6 border">
+          }} className="rounded-lg p-6 border">
             <h2 style={{ color: `var(--layer-3-text)` }} className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Activity style={{ color: `var(--layer-3-accent)` }} className="h-6 w-6" />
               Layer 3: Cross-Layer Correlation Diagnostics

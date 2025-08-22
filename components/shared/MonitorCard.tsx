@@ -73,7 +73,7 @@ function CustomTooltip({ active, payload, label, chartType, monitorType }: Custo
   }
 
   return (
-    <div className="bg-background/95 backdrop-blur-sm border border-border corner-sm shadow-lg p-3 min-w-[200px] max-w-[250px] z-50 relative">
+    <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 min-w-[200px] max-w-[250px] z-50 relative">
       {label && (
         <div className="text-xs text-muted-foreground mb-2 font-medium">
           {label}
@@ -88,7 +88,7 @@ function CustomTooltip({ active, payload, label, chartType, monitorType }: Custo
             <div key={index} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <div
-                  className="w-3 h-3 corner-xs flex-shrink-0"
+                  className="w-3 h-3 rounded flex-shrink-0"
                   style={{ backgroundColor: entry.color || metricInfo.color }}
                 />
                 <span className="text-xs font-medium text-foreground truncate">
@@ -674,7 +674,7 @@ export default function MonitorCard({
           )}
           {/* Header with Icon and Title */}
           <div className="flex items-start gap-3 mb-2">
-            <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitor)}`}>
               {(() => {
                 const IconComponent = getMonitorIcon(monitor)
                 return <IconComponent className="h-6 w-6" />
@@ -686,7 +686,7 @@ export default function MonitorCard({
               </FadeTitle>
               {/* Health Indicator below title */}
               <div className="flex items-center">
-                <div className={`inline-flex items-center px-2 py-1 corner-xs text-xs font-medium ${healthIndicator.bgColor} ${healthIndicator.color}`}>
+                <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${healthIndicator.bgColor} ${healthIndicator.color}`}>
                   <span className="text-[10px] font-semibold tracking-wide uppercase opacity-75 mr-1">
                     {healthIndicator.label}
                   </span>
@@ -700,13 +700,13 @@ export default function MonitorCard({
 
           {/* Time Series Chart */}
           <div className="flex-1 mb-1 relative">
-            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 corner-sm p-2 overflow-visible">
+            <div className="h-24 w-full bg-gradient-to-br from-muted/20 to-muted/5 rounded-lg p-2 overflow-visible">
               {isClient ? (
                 <ResponsiveContainer width="100%" height="100%">
                   {renderChart()}
                 </ResponsiveContainer>
               ) : (
-                <div className="flex items-center justify-center h-full bg-muted/30 corner-xs">
+                <div className="flex items-center justify-center h-full bg-muted/30 rounded">
                   <Activity className="h-4 w-4 text-muted-foreground animate-pulse" />
                 </div>
               )}
@@ -721,7 +721,7 @@ export default function MonitorCard({
                   <Activity className="h-3 w-3" />
                   Network Traffic
                 </span>
-                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 corner-xs">
+                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 rounded">
                   Last 15min
                 </span>
               </div>
@@ -731,7 +731,7 @@ export default function MonitorCard({
                   <TrendingUp className="h-3 w-3" />
                   Transaction Volume
                 </span>
-                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 corner-xs">
+                <span className="font-medium text-foreground bg-muted/50 px-2 py-0.5 rounded">
                   Last 15min
                 </span>
               </div>
@@ -756,7 +756,7 @@ export default function MonitorCard({
           </div>
         )}
         <div className="flex items-center gap-3 mb-3">
-          <div className={`w-12 h-12 corner-sm flex items-center justify-center ${getIconStyleClass(monitor)}`}>
+          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getIconStyleClass(monitor)}`}>
             {(() => {
               const IconComponent = getMonitorIcon(monitor)
               return <IconComponent className="h-6 w-6" />

@@ -718,7 +718,7 @@ If this does not meet expectations, feel free to suggest improvements.
                       <button
                         key={chip.id}
                         onClick={() => handleSuggestionClick(chip.prompt)}
-                        className="group p-4 text-left corner-sm border border-border bg-card hover:bg-accent hover:border-primary/50 transition-all duration-200 hover:shadow-md"
+                        className="group p-4 text-left rounded-lg border border-border bg-card hover:bg-accent hover:border-primary/50 transition-all duration-200 hover:shadow-md"
                       >
                         <div className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
                           {chip.label}
@@ -734,7 +734,7 @@ If this does not meet expectations, feel free to suggest improvements.
 
               {/* Enhanced Input Bar */}
               <div className="relative">
-                <div className="flex gap-3 p-4 corner-sm border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
+                <div className="flex gap-3 p-4 rounded-lg border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}

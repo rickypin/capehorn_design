@@ -155,7 +155,7 @@ export default function CardDemoPage() {
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• <strong>自动cursor检测</strong>: 有onClick或data-clickable时自动显示pointer</li>
               <li>• <strong>完整组件族</strong>: Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter</li>
-              <li>• <strong>设计系统集成</strong>: 使用corner-sm圆角，支持主题色彩</li>
+              <li>• <strong>设计系统集成</strong>: 使用rounded-lg圆角，支持主题色彩</li>
               <li>• <strong>响应式设计</strong>: 支持容器查询和响应式布局</li>
             </ul>
           </div>
