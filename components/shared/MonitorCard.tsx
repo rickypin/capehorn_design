@@ -114,7 +114,7 @@ const getTooltipConfig = (chartType: ChartType, monitorType: 'network' | 'transa
   position: { x: undefined, y: undefined },
   wrapperStyle: {
     zIndex: 9999,
-    pointerEvents: 'none'
+    pointerEvents: 'none' as const
   }
 })
 
@@ -301,7 +301,7 @@ export default function MonitorCard({
   const renderChart = () => {
     const chartType = monitor.chartType || (monitor.type === 'network' ? 'area' : 'line')
     // Use design tokens instead of hardcoded colors
-    const colors = monitor.chartColors || getMonitorTypeColors(monitor.type)
+    const colors = monitor.chartColors || getMonitorTypeColors(monitor.type || 'network')
     const uiColors = getChartUIColors()
     const style = monitor.chartStyle || { strokeWidth: 2, opacity: 1 }
 
@@ -316,7 +316,7 @@ export default function MonitorCard({
               </linearGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -334,7 +334,7 @@ export default function MonitorCard({
         return (
           <LineChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -351,7 +351,7 @@ export default function MonitorCard({
         return (
           <BarChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar
@@ -367,7 +367,7 @@ export default function MonitorCard({
         return (
           <ScatterChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ strokeDasharray: '3 3' }}
             />
             <Scatter
@@ -381,7 +381,7 @@ export default function MonitorCard({
         return (
           <LineChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -398,7 +398,7 @@ export default function MonitorCard({
         return (
           <ComposedChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Bar dataKey="req" fill={colors.primary} opacity={0.6} />
@@ -423,7 +423,7 @@ export default function MonitorCard({
               </linearGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -441,7 +441,7 @@ export default function MonitorCard({
         return (
           <LineChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
@@ -474,7 +474,7 @@ export default function MonitorCard({
         return (
           <BarChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar dataKey="req" stackId="a" fill={colors.primary} />
@@ -487,7 +487,7 @@ export default function MonitorCard({
         return (
           <ScatterChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ strokeDasharray: '3 3' }}
             />
             <Scatter
@@ -507,7 +507,7 @@ export default function MonitorCard({
         return (
           <BarChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             {data.map((_, index) => (
@@ -531,7 +531,7 @@ export default function MonitorCard({
               </radialGradient>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -549,7 +549,7 @@ export default function MonitorCard({
         return (
           <BarChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ fill: 'rgba(0,0,0,0.1)' }}
             />
             <Bar
@@ -577,7 +577,7 @@ export default function MonitorCard({
         return (
           <ComposedChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: uiColors.grid, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Bar dataKey="req" fill={colors.accent} opacity={0.3} />
@@ -616,7 +616,7 @@ export default function MonitorCard({
               </filter>
             </defs>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -643,7 +643,7 @@ export default function MonitorCard({
         return (
           <LineChart data={data}>
             <Tooltip
-              {...getTooltipConfig(chartType, monitor.type)}
+              {...getTooltipConfig(chartType, monitor.type || 'network')}
               cursor={{ stroke: colors.primary, strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Line
