@@ -3,6 +3,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
 :root {
   /* Updated color tokens to match modern AI-era design brief with cyan primary and clean neutrals */
   --background: #f9fafb; /* Light background for dashboard */
@@ -29,7 +35,61 @@
   --chart-3: #2563eb; /* Color for third data series */
   --chart-4: #1d4ed8; /* Color for fourth data series */
   --chart-5: #1e40af; /* Color for fifth data series */
+
+  /* Chart Color System - Semantic Design Tokens */
+  /* Primary chart colors for main data visualization */
+  --chart-primary: #3b82f6; /* Blue - primary data series */
+  --chart-secondary: #06b6d4; /* Cyan - secondary data series */
+  --chart-accent: #10b981; /* Emerald - accent/success data */
+
+  /* Metric-specific semantic colors */
+  --chart-warning: #f59e0b; /* Amber - warning states */
+  --chart-danger: #ef4444; /* Red - error/danger states */
+  --chart-info: #8b5cf6; /* Violet - informational data */
+  --chart-success: #10b981; /* Emerald - success states */
+
+  /* Network monitoring specific colors */
+  --chart-network-inbound: #3b82f6; /* Blue - inbound traffic */
+  --chart-network-outbound: #06b6d4; /* Cyan - outbound traffic */
+  --chart-network-latency: #ef4444; /* Red - latency/RTT */
+  --chart-network-loss: #f59e0b; /* Amber - packet loss */
+
+  /* Transaction monitoring specific colors */
+  --chart-transaction-requests: #f59e0b; /* Amber - request volume */
+  --chart-transaction-success: #10b981; /* Emerald - success rate */
+  --chart-transaction-response: #6366f1; /* Indigo - response time */
+  --chart-transaction-error: #ef4444; /* Red - error rate */
+
+  /* Chart UI elements */
+  --chart-grid: #6b7280; /* Gray - grid lines and cursors */
+  --chart-tooltip-bg: #ffffff; /* White - tooltip background */
+  --chart-tooltip-border: #e5e7eb; /* Light gray - tooltip border */
+
+  /* Monitor Layer Color System - Enhanced Visual Hierarchy */
+  /* Uses neutral tones with subtle color hints for better distinction */
+  /* Avoids red/green/yellow which have monitoring semantics */
+
+  /* Layer 1: Transaction Processing - Warm neutral with subtle amber hint */
+  --layer-1-bg: #fefcf3; /* Warm cream background */
+  --layer-1-border: #f3e8ab; /* Soft golden border */
+  --layer-1-text: #92400e; /* Warm brown text */
+  --layer-1-accent: #d97706; /* Amber accent for icons */
+
+  /* Layer 2: Network Transmission - Cool neutral with subtle slate hint */
+  --layer-2-bg: #f8fafc; /* Cool gray background */
+  --layer-2-border: #cbd5e1; /* Slate border */
+  --layer-2-text: #475569; /* Slate text */
+  --layer-2-accent: #64748b; /* Slate accent for icons */
+
+  /* Layer 3: Cross-Layer Analysis - Neutral with subtle indigo hint */
+  --layer-3-bg: #faf9ff; /* Very light indigo background */
+  --layer-3-border: #e0e7ff; /* Light indigo border */
+  --layer-3-text: #4338ca; /* Indigo text */
+  --layer-3-accent: #6366f1; /* Indigo accent for icons */
   --radius: 0.5rem; /* Corner rounding for cards */
+
+
+
   --sidebar: #ffffff; /* Background for sidebar */
   --sidebar-foreground: #4b5563; /* Text color for sidebar */
   --sidebar-primary: #0891b2; /* Primary action color for sidebar */
@@ -66,6 +126,35 @@
   --chart-3: #2563eb;
   --chart-4: #1d4ed8;
   --chart-5: #1e40af;
+
+  /* Chart Color System - Dark mode variants */
+  /* Primary chart colors for main data visualization */
+  --chart-primary: #60a5fa; /* Lighter blue for dark mode */
+  --chart-secondary: #22d3ee; /* Lighter cyan for dark mode */
+  --chart-accent: #34d399; /* Lighter emerald for dark mode */
+
+  /* Metric-specific semantic colors */
+  --chart-warning: #fbbf24; /* Lighter amber for dark mode */
+  --chart-danger: #f87171; /* Lighter red for dark mode */
+  --chart-info: #a78bfa; /* Lighter violet for dark mode */
+  --chart-success: #34d399; /* Lighter emerald for dark mode */
+
+  /* Network monitoring specific colors */
+  --chart-network-inbound: #60a5fa; /* Lighter blue for dark mode */
+  --chart-network-outbound: #22d3ee; /* Lighter cyan for dark mode */
+  --chart-network-latency: #f87171; /* Lighter red for dark mode */
+  --chart-network-loss: #fbbf24; /* Lighter amber for dark mode */
+
+  /* Transaction monitoring specific colors */
+  --chart-transaction-requests: #fbbf24; /* Lighter amber for dark mode */
+  --chart-transaction-success: #34d399; /* Lighter emerald for dark mode */
+  --chart-transaction-response: #818cf8; /* Lighter indigo for dark mode */
+  --chart-transaction-error: #f87171; /* Lighter red for dark mode */
+
+  /* Chart UI elements */
+  --chart-grid: #9ca3af; /* Lighter gray for dark mode */
+  --chart-tooltip-bg: #1e293b; /* Dark background for tooltip */
+  --chart-tooltip-border: #334155; /* Dark border for tooltip */
   --sidebar: #1e293b;
   --sidebar-foreground: #f1f5f9;
   --sidebar-primary: #0ea5e9;
@@ -74,6 +163,26 @@
   --sidebar-accent-foreground: #f1f5f9;
   --sidebar-border: #334155;
   --sidebar-ring: #0ea5e9;
+
+  /* Monitor Layer Color System - Dark mode variants */
+
+  /* Layer 1: Transaction Processing - Dark warm neutral */
+  --layer-1-bg: #1c1917; /* Dark warm background */
+  --layer-1-border: #44403c; /* Warm dark border */
+  --layer-1-text: #fbbf24; /* Warm amber text */
+  --layer-1-accent: #f59e0b; /* Amber accent for icons */
+
+  /* Layer 2: Network Transmission - Dark cool neutral */
+  --layer-2-bg: #0f172a; /* Dark slate background */
+  --layer-2-border: #334155; /* Slate border */
+  --layer-2-text: #94a3b8; /* Cool gray text */
+  --layer-2-accent: #64748b; /* Slate accent for icons */
+
+  /* Layer 3: Cross-Layer Analysis - Dark with indigo hint */
+  --layer-3-bg: #1e1b4b; /* Dark indigo background */
+  --layer-3-border: #3730a3; /* Indigo border */
+  --layer-3-text: #a5b4fc; /* Light indigo text */
+  --layer-3-accent: #6366f1; /* Indigo accent for icons */
 }
 
 @theme inline {
@@ -101,10 +210,33 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Chart Color System - Tailwind mappings */
+  --color-chart-primary: var(--chart-primary);
+  --color-chart-secondary: var(--chart-secondary);
+  --color-chart-accent: var(--chart-accent);
+  --color-chart-warning: var(--chart-warning);
+  --color-chart-danger: var(--chart-danger);
+  --color-chart-info: var(--chart-info);
+  --color-chart-success: var(--chart-success);
+  --color-chart-network-inbound: var(--chart-network-inbound);
+  --color-chart-network-outbound: var(--chart-network-outbound);
+  --color-chart-network-latency: var(--chart-network-latency);
+  --color-chart-network-loss: var(--chart-network-loss);
+  --color-chart-transaction-requests: var(--chart-transaction-requests);
+  --color-chart-transaction-success: var(--chart-transaction-success);
+  --color-chart-transaction-response: var(--chart-transaction-response);
+  --color-chart-transaction-error: var(--chart-transaction-error);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-tooltip-bg: var(--chart-tooltip-bg);
+  --color-chart-tooltip-border: var(--chart-tooltip-border);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -113,6 +245,20 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Monitor Layer Color System - Tailwind mappings */
+  --color-layer-1-bg: var(--layer-1-bg);
+  --color-layer-1-border: var(--layer-1-border);
+  --color-layer-1-text: var(--layer-1-text);
+  --color-layer-1-accent: var(--layer-1-accent);
+  --color-layer-2-bg: var(--layer-2-bg);
+  --color-layer-2-border: var(--layer-2-border);
+  --color-layer-2-text: var(--layer-2-text);
+  --color-layer-2-accent: var(--layer-2-accent);
+  --color-layer-3-bg: var(--layer-3-bg);
+  --color-layer-3-border: var(--layer-3-border);
+  --color-layer-3-text: var(--layer-3-text);
+  --color-layer-3-accent: var(--layer-3-accent);
 }
 
 @layer base {
@@ -121,5 +267,140 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Cursor Pointer Consistency Layer */
+@layer components {
+  /* Ensure all interactive elements have proper cursor styling */
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select,
+  summary,
+  a[href],
+  label[for],
+  [tabindex]:not([tabindex="-1"]),
+  [data-clickable="true"],
+  [onClick] {
+    @apply cursor-pointer;
+  }
+
+  /* Disabled states should show not-allowed cursor */
+  button:disabled,
+  [role="button"]:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  input:disabled,
+  select:disabled,
+  [aria-disabled="true"] {
+    @apply cursor-not-allowed;
+  }
+
+  /* Interactive cards and clickable containers */
+  [data-slot="card"][onClick],
+  [data-slot="card"][data-clickable="true"],
+  .cursor-pointer {
+    @apply cursor-pointer;
+  }
+
+  /* Ensure proper cursor for form elements */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    @apply cursor-text;
+  }
+
+  /* Utility classes for explicit cursor control */
+  .clickable {
+    @apply cursor-pointer;
+  }
+
+  .not-clickable {
+    @apply cursor-default;
+  }
+
+
+
+
+
+  /* Monitor Icon Unified Diagonal Texture System */
+  /* Simple diagonal stripe pattern for all icons */
+
+  .icon-texture-diagonal {
+    position: relative;
+    background:
+      linear-gradient(45deg, transparent 40%, rgba(148, 163, 184, 0.1) 40%, rgba(148, 163, 184, 0.1) 60%, transparent 60%),
+      linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background-size: 8px 8px, 100% 100%;
+  }
+
+  /* Ensure icons appear above texture patterns */
+  .icon-texture-diagonal svg {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Component-specific styles */
+@layer components {
+  /* Utility: single-line text with gradient fade at right edge */
+  .text-singleline-fade {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    /* Create a right-edge fade using a gradient mask; WebKit supports mask-image */
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  }
+
+  /* CSS 动画相关代码已清理 */
+  /* Monitor Card Component - using rem for better scalability */
+  .monitor-card-size {
+    width: 20rem;  /* 320px / 16px = 20rem */
+    height: 15rem; /* 240px / 16px = 15rem */
+  }
+
+  /* Responsive Monitor Card in Chat - scales down for narrow containers */
+  .chat-layout-responsive .monitor-card-size {
+    width: min(20rem, calc(100% - 2rem)); /* Scale down if container is narrow */
+    height: auto; /* Allow height to adjust proportionally */
+    min-height: 12rem; /* Minimum height to maintain readability */
+    max-width: 20rem; /* Don't exceed original size */
+  }
+
+  /* Extra compact mode for very narrow chat areas */
+  .chat-compact-mode .monitor-card-size {
+    width: min(18rem, calc(100% - 1rem));
+    min-height: 10rem;
+  }
+
+  /* Monitor Grid Layout Component */
+  .monitor-grid-responsive {
+    display: grid;
+    gap: 1rem; /* Use rem units for consistency */
+    justify-content: center;
+
+    /* Dynamic grid columns based on available space */
+    grid-template-columns: repeat(auto-fit, 20rem); /* 320px = 20rem */
+
+    /* Calculate available width: viewport - sidebar - padding */
+    width: calc(100vw - 3rem - 3rem); /* 48px = 3rem */
+    margin: 0 auto;
+
+    /* Ensure minimum spacing from container edges */
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
 }

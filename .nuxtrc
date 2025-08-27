@@ -1,0 +1,9 @@
+{
+  "typescript": {
+    "strict": true,
+    "typeCheck": true
+  },
+  "devtools": {
+    "enabled": true
+  }
+}

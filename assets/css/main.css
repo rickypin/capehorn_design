@@ -1,0 +1,173 @@
+/* Creating main CSS file for Nuxt 3 with shadcn-vue design tokens */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    /* Updated color tokens to match modern AI-era design brief with cyan primary and clean neutrals */
+    --background: 210 40% 98%; /* Light background for dashboard */
+    --foreground: 222.2 84% 4.9%; /* Dark foreground for text */
+    --card: 0 0% 100%; /* Background for cards */
+    --card-foreground: 222.2 84% 4.9%; /* Text color on cards */
+    --popover: 0 0% 100%; /* Background for popovers */
+    --popover-foreground: 222.2 84% 4.9%; /* Text color on popovers */
+    --primary: 188 78% 41%; /* Primary action color for buttons */
+    --primary-foreground: 210 40% 98%; /* Text color on primary buttons */
+    --secondary: 199 89% 48%; /* Secondary action color */
+    --secondary-foreground: 210 40% 98%; /* Text color on secondary actions */
+    --muted: 210 40% 96%; /* Background for muted sections */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Text color for muted sections */
+    --accent: 199 89% 48%; /* Accent color for highlights */
+    --accent-foreground: 210 40% 98%; /* Text color on accent elements */
+    --destructive: 0 84.2% 60.2%; /* Color for alerts or errors */
+    --destructive-foreground: 210 40% 98%; /* Text color for alerts */
+    --border: 214.3 31.8% 91.4%; /* Light border for cards */
+    --input: 214.3 31.8% 91.4%; /* Input field background */
+    --ring: 188 78% 41%; /* Focus ring color */
+    --radius: 0.5rem; /* Corner rounding for cards */
+
+    /* Chart Color System - Semantic Design Tokens */
+    --chart-primary: 217.2 91.2% 59.8%; /* Blue - primary data series */
+    --chart-secondary: 188 78% 41%; /* Cyan - secondary data series */
+    --chart-accent: 142.1 76.2% 36.3%; /* Emerald - accent/success data */
+    --chart-warning: 45.4 93.4% 47.5%; /* Amber - warning states */
+    --chart-danger: 0 84.2% 60.2%; /* Red - error/danger states */
+    --chart-info: 262.1 83.3% 57.8%; /* Violet - informational data */
+    --chart-success: 142.1 76.2% 36.3%; /* Emerald - success states */
+
+    /* Monitor Layer Color System */
+    --layer-1-bg: 48 100% 96.1%; /* Warm cream background */
+    --layer-1-border: 45.4 93.4% 47.5%; /* Soft golden border */
+    --layer-1-text: 30.7 83% 34.9%; /* Warm brown text */
+    --layer-1-accent: 32.1 94.6% 43.7%; /* Amber accent for icons */
+
+    --layer-2-bg: 210 40% 98%; /* Cool gray background */
+    --layer-2-border: 214.3 31.8% 91.4%; /* Slate border */
+    --layer-2-text: 215.4 16.3% 46.9%; /* Slate text */
+    --layer-2-accent: 215.3 25% 26.7%; /* Slate accent for icons */
+
+    --layer-3-bg: 240 100% 99%; /* Very light indigo background */
+    --layer-3-border: 234.4 89% 73.9%; /* Light indigo border */
+    --layer-3-text: 243.4 75.4% 58.6%; /* Indigo text */
+    --layer-3-accent: 262.1 83.3% 57.8%; /* Indigo accent for icons */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 89% 48%;
+
+    /* Dark mode chart colors */
+    --chart-primary: 217.2 91.2% 59.8%;
+    --chart-secondary: 188 78% 41%;
+    --chart-accent: 142.1 76.2% 36.3%;
+    --chart-warning: 45.4 93.4% 47.5%;
+    --chart-danger: 0 84.2% 60.2%;
+    --chart-info: 262.1 83.3% 57.8%;
+    --chart-success: 142.1 76.2% 36.3%;
+
+    /* Dark mode layer colors */
+    --layer-1-bg: 24 9.8% 10%;
+    --layer-1-border: 32.1 94.6% 43.7%;
+    --layer-1-text: 45.4 93.4% 47.5%;
+    --layer-1-accent: 32.1 94.6% 43.7%;
+
+    --layer-2-bg: 222.2 84% 4.9%;
+    --layer-2-border: 217.2 32.6% 17.5%;
+    --layer-2-text: 215 20.2% 65.1%;
+    --layer-2-accent: 215.3 25% 26.7%;
+
+    --layer-3-bg: 240 10% 3.9%;
+    --layer-3-border: 243.4 75.4% 58.6%;
+    --layer-3-text: 234.4 89% 73.9%;
+    --layer-3-accent: 262.1 83.3% 57.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Monitor Card Component - using rem for better scalability */
+@layer components {
+  .monitor-card-size {
+    width: 20rem; /* 320px / 16px = 20rem */
+    height: 15rem; /* 240px / 16px = 15rem */
+  }
+
+  /* Responsive Monitor Card in Chat - scales down for narrow containers */
+  .chat-layout-responsive .monitor-card-size {
+    width: min(20rem, calc(100% - 2rem));
+    height: auto;
+    min-height: 12rem;
+    max-width: 20rem;
+  }
+
+  /* Extra compact mode for very narrow chat areas */
+  .chat-compact-mode .monitor-card-size {
+    width: min(18rem, calc(100% - 1rem));
+    min-height: 10rem;
+  }
+
+  /* Monitor Grid Layout Component */
+  .monitor-grid-responsive {
+    display: grid;
+    gap: 1rem;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, 20rem);
+    width: calc(100vw - 3rem - 3rem);
+    margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Icon texture diagonal */
+  .icon-texture-diagonal {
+    position: relative;
+    background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(148, 163, 184, 0.1) 40%,
+        rgba(148, 163, 184, 0.1) 60%,
+        transparent 60%
+      ), linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background-size: 8px 8px, 100% 100%;
+  }
+
+  .icon-texture-diagonal svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Utility: single-line text with gradient fade at right edge */
+  .text-singleline-fade {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  }
+}

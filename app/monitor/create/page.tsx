@@ -6,9 +6,55 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ChevronLeft, ChevronRight, Home, Shield, Monitor as MonitorIcon, Send, Bot, User } from "lucide-react"
+import { Send, Bot, User } from "lucide-react"
 import VisaPreview from "@/components/shared/VisaPreview"
+import PreviewHeader from "@/components/shared/PreviewHeader"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
+import Sidebar from "@/components/shared/Sidebar"
+import Breadcrumb from "@/components/shared/Breadcrumb"
+import { ResizableSplitPane } from "@/components/ui/resizable"
+
+// Custom hook for responsive layout detection with proper cleanup
+function useResponsiveLayout(
+  elementRef: React.RefObject<HTMLElement | null>,
+  threshold: number = 400,
+  enabled: boolean = true
+) {
+  const [isCompact, setIsCompact] = useState(false)
+
+  useEffect(() => {
+    const checkWidth = () => {
+      if (elementRef.current) {
+        const width = elementRef.current.offsetWidth
+        setIsCompact(width <= threshold)
+      }
+    }
+
+    if (!enabled || !elementRef.current) return
+
+    // Initial check
+    checkWidth()
+
+    // Set up ResizeObserver for precise container size detection
+    let resizeObserver: ResizeObserver | null = null
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(checkWidth)
+      resizeObserver.observe(elementRef.current)
+    }
+
+    // Fallback: window resize listener
+    window.addEventListener('resize', checkWidth, { passive: true })
+
+    return () => {
+      window.removeEventListener('resize', checkWidth)
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [elementRef, threshold, enabled])
+
+  return isCompact
+}
 
 // Message interface for chat functionality
 interface Message {
@@ -126,12 +172,15 @@ const FormattedMessage = ({
 
 export default function NewMonitorPage() {
   const router = useRouter()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState("Monitor")
 
   // Preview mode state
   const [showPreview, setShowPreview] = useState(false)
   const [previewType, setPreviewType] = useState<string | null>(null)
+
+  // Preview controls state
+  const [isSimulatedData, setIsSimulatedData] = useState(false)
+  const [scenario, setScenario] = useState("normal")
 
   // Chat state management
   const [messages, setMessages] = useState<Message[]>([
@@ -144,6 +193,10 @@ export default function NewMonitorPage() {
   ])
   const [inputValue, setInputValue] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+
+  // Use custom hook for responsive layout detection
+  const isCompactLayout = useResponsiveLayout(chatContainerRef, 400, showPreview)
 
   // Monitor card data definitions
   const visaServiceMonitor: MonitorCardData = {
@@ -220,6 +273,8 @@ export default function NewMonitorPage() {
     }
   }, [showPreview])
 
+
+
   // Handle sending messages
   const handleSendMessage = () => {
     if (!inputValue.trim()) return
@@ -259,6 +314,12 @@ export default function NewMonitorPage() {
   const handleCardClick = (monitor: MonitorCardData) => {
     setShowPreview(true)
     setPreviewType(monitor.id === "visa-service" ? "visa" : "network")
+  }
+
+  // Handle closing the preview
+  const handleClosePreview = () => {
+    setShowPreview(false)
+    setPreviewType(null)
   }
 
   // Handle suggestion chip click
@@ -475,85 +536,34 @@ If this does not meet expectations, feel free to suggest improvements.
   return (
     <div className="flex h-screen bg-background">
       {/* Left Navigation Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out flex flex-col border-r border-border bg-card fixed left-0 top-0 h-full z-30`}>
-        {/* Navigation Header */}
-        <div className="p-4 border-b border-border">
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-            {!sidebarCollapsed && (
-              <h2 className="font-semibold text-foreground">Navigation</h2>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="h-8 w-8 p-0"
-              title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Navigation Items */}
-        <div className="flex-1 p-2">
-          <nav className="space-y-2">
-            <Button
-              variant={activeNavItem === "Sentire" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Sentire")}
-              title={sidebarCollapsed ? "Sentire" : undefined}
-            >
-              <Shield className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Sentire</span>}
-            </Button>
-            <Button
-              variant={activeNavItem === "Monitor" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Monitor")}
-              title={sidebarCollapsed ? "Monitor" : undefined}
-            >
-              <MonitorIcon className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Monitor</span>}
-            </Button>
-          </nav>
-        </div>
-      </div>
+      <Sidebar
+        activeNavItem={activeNavItem}
+        onNavItemChange={setActiveNavItem}
+      />
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 ease-in-out`}>
+      <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <div className="fixed top-0 right-0 z-20 bg-card border-b border-border" style={{ left: sidebarCollapsed ? '64px' : '256px', transition: 'left 300ms ease-in-out' }}>
-          <div className="px-6 py-3">
-            <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 text-muted-foreground hover:text-foreground"
-                onClick={() => router.push("/")}
-              >
-                <Home className="h-4 w-4" />
-              </Button>
-              <span className="text-muted-foreground">/</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto px-2 py-1 text-foreground font-medium hover:bg-muted"
-                onClick={() => router.push("/monitor")}
-              >
-                Monitor
-              </Button>
-              <span className="text-muted-foreground">/</span>
-              <span className="text-foreground font-medium">New Monitor</span>
-            </nav>
-          </div>
-        </div>
+        <Breadcrumb items={[
+          { label: "Monitor", href: "/monitor" },
+          { label: "New Monitor", isActive: true }
+        ]} />
 
-        {/* Main Content - Chat Interface or Split Layout */}
-        <div className="flex-1 flex bg-background h-full pt-[52px]">
+        {/* Main Content - Chat Interface or Resizable Split Layout */}
+        <div className="flex-1 flex bg-background overflow-hidden">
           {showPreview ? (
-            <>
-              {/* Chat Area - 1/4 width */}
-              <div className="w-1/4 flex flex-col border-r border-border h-full">
+            <ResizableSplitPane
+              defaultLeftWidth={480} // Default 480px to accommodate monitor cards (320px + padding)
+              minLeftWidth={360}     // Minimum 360px
+              maxLeftWidth={800}     // Maximum 800px
+              leftPanel={
+                <div
+                  ref={chatContainerRef}
+                  className={`flex flex-col h-full chat-layout-responsive ${
+                    isCompactLayout ? 'chat-compact-mode' : ''
+                  }`}
+                  title={`Chat Layout: ${isCompactLayout ? 'Compact' : 'Default'}`}
+                >
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   <div className="space-y-4">
@@ -616,14 +626,39 @@ If this does not meet expectations, feel free to suggest improvements.
                     </Button>
                   </div>
                 </div>
-              </div>
+                </div>
+              }
+              rightPanel={
+                <div className="flex flex-col h-full overflow-hidden">
+                  {/* Preview Header Bar */}
+                  <PreviewHeader
+                    isSimulatedData={isSimulatedData}
+                    onSimulatedDataChange={setIsSimulatedData}
+                    scenario={scenario}
+                    onScenarioChange={setScenario}
+                    onClose={handleClosePreview}
+                  />
 
-              {/* Preview Area - 3/4 width */}
-              <div className="flex-1 flex flex-col h-full">
-                {previewType === "visa" && <VisaPreview className="flex-1" />}
-                {previewType === "network" && <VisaPreview className="flex-1" />}
-              </div>
-            </>
+                  {/* Preview Content */}
+                  {previewType === "visa" && (
+                    <VisaPreview
+                      className="flex-1 overflow-hidden"
+                      hideDataControls={true}
+                      isSimulatedData={isSimulatedData}
+                      scenario={scenario}
+                    />
+                  )}
+                  {previewType === "network" && (
+                    <VisaPreview
+                      className="flex-1 overflow-hidden"
+                      hideDataControls={true}
+                      isSimulatedData={isSimulatedData}
+                      scenario={scenario}
+                    />
+                  )}
+                </div>
+              }
+            />
           ) : (
             /* Full Width Chat Interface */
             <div className="flex-1 flex flex-col">
@@ -702,7 +737,7 @@ If this does not meet expectations, feel free to suggest improvements.
 
               {/* Enhanced Input Bar */}
               <div className="relative">
-                <div className="flex gap-3 p-4 rounded-xl border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
+                <div className="flex gap-3 p-4 rounded-lg border-2 border-border bg-background shadow-lg hover:border-primary/30 focus-within:border-primary/50 transition-all duration-200">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}

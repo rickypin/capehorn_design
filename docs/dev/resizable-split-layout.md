@@ -1,0 +1,214 @@
+# Resizable Split Layout Implementation
+
+## 概述
+
+实现了用户可调节的分屏布局，解决了对话框收窄时 monitor card 宽度超出问题。用户现在可以自由调整左右两侧的宽度比例，确保 monitor card 能够正常显示。
+
+## 问题解决
+
+### 原始问题
+1. **固定宽度限制**: 聊天区域固定为 384px，无法容纳 320px 的 monitor card + padding
+2. **无法调节**: 用户无法根据需要调整左右分屏的宽度比例
+3. **空间浪费**: 在宽屏显示器上，固定宽度导致空间利用不充分
+
+### 解决方案
+1. **可调节分屏**: 实现拖拽调节左右面板宽度
+2. **合理默认值**: 默认 480px 宽度，足以容纳 monitor card
+3. **智能约束**: 最小 360px，最大 800px，确保使用体验
+
+## 技术实现
+
+### 1. ResizableSplitPane 组件
+
+**文件**: `components/ui/resizable.tsx`
+
+**核心特性**:
+- 鼠标拖拽调节宽度
+- 智能约束范围 (360px - 800px)
+- 实时响应式调整
+- 平滑的视觉反馈
+
+\`\`\`tsx
+<ResizableSplitPane
+  defaultLeftWidth={480} // 默认 480px
+  minLeftWidth={360}     // 最小 360px
+  maxLeftWidth={800}     // 最大 800px
+  leftPanel={<ChatArea />}
+  rightPanel={<PreviewArea />}
+/>
+\`\`\`
+
+### 2. 响应式 Monitor Card
+
+**CSS 增强**:
+\`\`\`css
+/* 聊天区域内的 monitor card 自适应 */
+.chat-layout-responsive .monitor-card-size {
+  width: min(20rem, calc(100% - 2rem));
+  height: auto;
+  min-height: 12rem;
+  max-width: 20rem;
+}
+
+/* 紧凑模式下进一步缩小 */
+.chat-compact-mode .monitor-card-size {
+  width: min(18rem, calc(100% - 1rem));
+  min-height: 10rem;
+}
+\`\`\`
+
+### 3. 智能布局切换
+
+**断点调整**: 从 352px 提升到 400px
+- 考虑 monitor card 需要更多空间
+- 提供更好的用户体验阈值
+
+\`\`\`typescript
+// 当聊天容器宽度 ≤ 400px 时切换到紧凑布局
+setIsCompactLayout(width <= 400)
+\`\`\`
+
+## 用户体验
+
+### 拖拽调节
+- **拖拽区域**: 1px 宽的分隔线，hover 时高亮
+- **视觉反馈**: 拖拽时分隔线变色，鼠标变为调节光标
+- **约束范围**: 自动限制在合理范围内，防止极端情况
+
+### 默认配置
+- **初始宽度**: 480px (足以容纳 320px monitor card + 边距)
+- **最小宽度**: 360px (保证基本可用性)
+- **最大宽度**: 800px (避免聊天区域过宽)
+
+### 响应式行为
+- **宽屏模式**: 传统左右对话布局
+- **窄屏模式**: 头像统一左侧，内容区域最大化
+- **自动切换**: 基于实际容器宽度，无需手动设置
+
+## 兼容性
+
+### 浏览器支持
+- **现代浏览器**: 完全支持 (Chrome 88+, Firefox 87+, Safari 14+)
+- **ResizeObserver**: 用于精确检测容器尺寸变化
+- **降级策略**: 不支持的浏览器仍可使用基本功能
+
+### 设备适配
+- **桌面端**: 完整拖拽调节功能
+- **平板端**: 支持触摸拖拽
+- **移动端**: 自动切换到紧凑布局
+
+## 性能优化
+
+### 事件处理
+- **防抖机制**: 避免频繁的尺寸计算
+- **事件清理**: 组件卸载时正确清理事件监听器
+- **内存管理**: ResizeObserver 的正确创建和销毁
+
+### 渲染优化
+- **CSS 变换**: 使用 transform 而非重新布局
+- **GPU 加速**: 利用硬件加速提升拖拽性能
+- **最小重绘**: 只更新必要的 DOM 元素
+
+## 测试验证
+
+### 功能测试
+1. **拖拽调节**: 验证左右面板宽度可以正常调节
+2. **约束范围**: 确认最小/最大宽度限制生效
+3. **Monitor Card**: 验证卡片在不同宽度下正常显示
+4. **响应式切换**: 测试紧凑布局的自动切换
+
+### 兼容性测试
+1. **浏览器测试**: 在主流浏览器中验证功能
+2. **设备测试**: 桌面、平板、手机的适配情况
+3. **性能测试**: 拖拽流畅度和内存使用情况
+
+### 用户体验测试
+1. **易用性**: 拖拽操作的直观性和便利性
+2. **视觉反馈**: 交互状态的清晰指示
+3. **默认配置**: 初始状态是否满足大多数使用场景
+
+## 文件修改清单
+
+### 新增文件
+1. **`components/ui/resizable.tsx`** - 可调节分屏组件
+
+### 修改文件
+1. **`app/monitor/create/page.tsx`**
+   - 引入 ResizableSplitPane 组件
+   - 替换固定宽度布局
+   - 调整响应式检测阈值
+
+2. **`app/globals.css`**
+   - 添加响应式 monitor card 样式
+   - 优化紧凑模式显示效果
+
+3. **`docs/dev/resizable-split-layout.md`**
+   - 完整的实现文档和使用指南
+
+## 代码审查与最佳实践
+
+### ✅ 符合 React 最佳实践
+
+#### 1. **Hooks 使用规范**
+- ✅ 正确的 useRef 使用，避免在渲染期间访问 ref.current
+- ✅ useEffect 依赖数组包含所有必要依赖项
+- ✅ 事件监听器在 useEffect 清理函数中正确移除
+- ✅ 使用自定义 Hook 封装复杂逻辑
+
+#### 2. **性能优化**
+- ✅ 使用 useCallback 优化事件处理器
+- ✅ 事件监听器使用 passive 选项提升性能
+- ✅ ResizeObserver 优于 window resize 事件
+- ✅ 避免不必要的重新渲染
+
+#### 3. **内存管理**
+- ✅ ResizeObserver 正确调用 disconnect()
+- ✅ DOM 事件监听器正确清理
+- ✅ 样式修改在清理时重置
+
+#### 4. **TypeScript 类型安全**
+- ✅ 完整的接口定义
+- ✅ 正确的事件处理器类型注解
+- ✅ 合理使用可选属性和默认值
+
+### 🔧 代码改进
+
+#### 1. **自定义 Hook 封装**
+\`\`\`typescript
+// 封装响应式布局检测逻辑
+function useResponsiveLayout(
+  elementRef: React.RefObject<HTMLElement>,
+  threshold: number = 400,
+  enabled: boolean = true
+) {
+  // 实现细节...
+}
+\`\`\`
+
+#### 2. **事件处理优化**
+\`\`\`typescript
+// 使用 passive 和 once 选项优化事件监听
+document.addEventListener('mousemove', handleMouseMove, { passive: true })
+document.addEventListener('mouseup', handleMouseUp, { once: true })
+\`\`\`
+
+#### 3. **错误边界处理**
+- 添加 ResizeObserver 可用性检查
+- 提供降级方案（window resize）
+- 防止内存泄漏
+
+## 未来扩展
+
+### 可能的改进
+1. **记忆功能**: 保存用户的宽度偏好设置
+2. **预设模式**: 提供几种常用的宽度预设
+3. **键盘操作**: 支持键盘快捷键调节宽度
+4. **动画过渡**: 添加平滑的宽度变化动画
+5. **触摸设备优化**: 改进移动设备上的拖拽体验
+
+### 维护建议
+1. **定期测试**: 确保在新浏览器版本中的兼容性
+2. **性能监控**: 关注拖拽操作的性能表现
+3. **用户反馈**: 收集用户对默认配置的意见
+4. **代码审查**: 保持代码质量和可维护性
+5. **单元测试**: 添加组件和 Hook 的测试用例

@@ -16,18 +16,24 @@ export interface MonitorDataPoint {
   errorRate: number
 }
 
-// Generate time series data for the last 15 minutes
-export function generateMiniCardData(type: 'network' | 'transaction'): MonitorDataPoint[] {
+export type DataPattern = 'normal' | 'spike' | 'step' | 'oscillating' | 'declining' | 'recovering' |
+  'sawtooth' | 'exponential' | 'logarithmic' | 'random-walk' | 'heartbeat' | 'cascade' | 'pulse-burst'
+
+// Generate time series data with specific patterns for different chart types
+export function generateMiniCardDataWithPattern(
+  type: 'network' | 'transaction',
+  pattern: DataPattern = 'normal'
+): MonitorDataPoint[] {
   const now = Date.now()
   const data: MonitorDataPoint[] = []
   const minutes = 15
 
   for (let i = minutes; i >= 0; i--) {
     const ts = now - i * 60 * 1000
-    const time = new Date(ts).toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const time = new Date(ts).toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit'
     })
 
     // Base values
@@ -41,45 +47,154 @@ export function generateMiniCardData(type: 'network' | 'transaction'): MonitorDa
     let baseRespP95 = 350
     let baseErrorRate = 0.2
 
-    // Add some realistic variation
-    const noise = () => (Math.random() - 0.5) * 0.1
-    const timeVariation = Math.sin(i * 0.3) * 0.2 // Simulate daily patterns
+    // Apply pattern-specific modifications
+    const progress = (minutes - i) / minutes // 0 to 1
 
-    if (type === 'network') {
-      // Network-focused variations
-      baseInMbps += timeVariation * 50
-      baseOutMbps += timeVariation * 30
-      baseRtt += Math.random() * 20
-      baseLoss += Math.random() * 0.05
-    } else {
-      // Transaction-focused variations
-      baseReq += timeVariation * 100
-      baseSuccessRate -= Math.random() * 0.3
-      baseRespP95 += Math.random() * 50
+    switch (pattern) {
+      case 'spike':
+        // Create a spike in the middle
+        if (i >= 6 && i <= 9) {
+          baseReq *= 2.5
+          baseRtt *= 1.8
+          baseSuccessRate -= 2
+        }
+        break
+
+      case 'step':
+        // Step function - higher values in second half
+        if (i <= 7) {
+          baseReq *= 1.6
+          baseInMbps *= 1.4
+          baseRtt *= 1.3
+        }
+        break
+
+      case 'oscillating':
+        // Sine wave pattern
+        const oscillation = Math.sin(i * 0.8) * 0.4
+        baseReq += baseReq * oscillation
+        baseInMbps += baseInMbps * oscillation
+        baseRtt += baseRtt * Math.abs(oscillation)
+        break
+
+      case 'declining':
+        // Gradual decline
+        const decline = progress * 0.6
+        baseReq *= (1 - decline)
+        baseInMbps *= (1 - decline)
+        baseSuccessRate -= decline * 2
+        break
+
+      case 'recovering':
+        // Recovery pattern - bad start, improving
+        const recovery = 1 - Math.exp(-progress * 3)
+        baseSuccessRate = 97 + recovery * 2.7
+        baseRtt = 200 - recovery * 80
+        baseErrorRate = 2 - recovery * 1.8
+        break
+
+      case 'sawtooth':
+        // Sawtooth wave pattern
+        const sawtooth = (progress * 4) % 1
+        baseReq += baseReq * sawtooth * 0.8
+        baseInMbps += baseInMbps * sawtooth * 0.6
+        baseRtt += baseRtt * (1 - sawtooth) * 0.4
+        break
+
+      case 'exponential':
+        // Exponential growth
+        const exponential = Math.pow(progress, 2) * 2
+        baseReq *= (1 + exponential)
+        baseInMbps *= (1 + exponential * 0.5)
+        baseRtt *= (1 + exponential * 0.3)
+        break
+
+      case 'logarithmic':
+        // Logarithmic curve
+        const logarithmic = Math.log(1 + progress * 9) / Math.log(10)
+        baseReq *= (1 + logarithmic * 0.8)
+        baseSuccessRate += logarithmic * 2
+        baseRtt *= (1 - logarithmic * 0.2)
+        break
+
+      case 'random-walk':
+        // Random walk pattern
+        const randomWalk = Math.random() > 0.5 ? 1 : -1
+        baseReq += baseReq * randomWalk * 0.3
+        baseInMbps += baseInMbps * randomWalk * 0.2
+        baseRtt += baseRtt * Math.abs(randomWalk) * 0.1
+        break
+
+      case 'heartbeat':
+        // Heartbeat pattern - double peaks
+        const heartbeat = Math.sin(i * 1.2) + 0.5 * Math.sin(i * 2.4)
+        baseReq += baseReq * heartbeat * 0.4
+        baseInMbps += baseInMbps * heartbeat * 0.3
+        baseRtt += baseRtt * Math.abs(heartbeat) * 0.2
+        break
+
+      case 'cascade':
+        // Cascade pattern - step-down
+        const cascade = Math.floor(progress * 4) / 4
+        baseReq *= (1 - cascade * 0.6)
+        baseSuccessRate -= cascade * 3
+        baseRtt += cascade * 50
+        break
+
+      case 'pulse-burst':
+        // Pulse burst pattern - rhythmic bursts with varying intensity
+        const pulseFreq = Math.sin(i * 0.8) * Math.sin(i * 0.3)
+        const burstIntensity = Math.abs(Math.sin(i * 0.5)) * 2
+        const baseline = 0.3 + Math.sin(i * 0.1) * 0.2
+
+        baseReq *= (baseline + pulseFreq * burstIntensity)
+        baseInMbps *= (baseline + pulseFreq * burstIntensity * 0.7)
+        baseRtt += Math.abs(pulseFreq) * burstIntensity * 30
+        baseSuccessRate -= Math.abs(pulseFreq) * burstIntensity * 0.5
+        break
+
+      default: // 'normal'
+        // Standard variation
+        const timeVariation = Math.sin(i * 0.3) * 0.2
+        if (type === 'network') {
+          baseInMbps += timeVariation * 50
+          baseOutMbps += timeVariation * 30
+        } else {
+          baseReq += timeVariation * 100
+        }
+        break
     }
+
+    // Add some noise
+    const noise = () => (Math.random() - 0.5) * 0.1
 
     data.push({
       ts,
       time,
-      rtt: Math.max(10, baseRtt + baseRtt * noise()),
-      loss: Math.max(0, baseLoss + baseLoss * noise()),
-      retrans: Math.max(0, baseRetrans + baseRetrans * noise()),
-      inMbps: Math.max(10, baseInMbps + baseInMbps * noise()),
-      outMbps: Math.max(10, baseOutMbps + baseOutMbps * noise()),
-      req: Math.max(50, baseReq + baseReq * noise()),
-      successRate: Math.min(100, Math.max(95, baseSuccessRate + baseSuccessRate * noise() * 0.1)),
-      respP95: Math.max(50, baseRespP95 + baseRespP95 * noise()),
-      errorRate: Math.max(0, baseErrorRate + baseErrorRate * noise()),
+      rtt: +Math.max(10, baseRtt + baseRtt * noise()).toFixed(2),
+      loss: +Math.max(0, baseLoss + baseLoss * noise()).toFixed(2),
+      retrans: +Math.max(0, baseRetrans + baseRetrans * noise()).toFixed(2),
+      inMbps: +Math.max(10, baseInMbps + baseInMbps * noise()).toFixed(2),
+      outMbps: +Math.max(10, baseOutMbps + baseOutMbps * noise()).toFixed(2),
+      req: Math.round(Math.max(50, baseReq + baseReq * noise())),
+      successRate: +Math.min(100, Math.max(95, baseSuccessRate + baseSuccessRate * noise() * 0.1)).toFixed(2),
+      respP95: +Math.max(50, baseRespP95 + baseRespP95 * noise()).toFixed(2),
+      errorRate: +Math.max(0, baseErrorRate + baseErrorRate * noise()).toFixed(2),
     })
   }
 
   return data
 }
 
+// Generate time series data for the last 15 minutes (backward compatibility)
+export function generateMiniCardData(type: 'network' | 'transaction'): MonitorDataPoint[] {
+  return generateMiniCardDataWithPattern(type, 'normal')
+}
+
 // Calculate Network Health Indicator
 export function calculateNHI(points: MonitorDataPoint[]): number {
   if (!points.length) return 0
-  
+
   const avgRtt = points.reduce((sum, p) => sum + p.rtt, 0) / points.length
   const avgLoss = points.reduce((sum, p) => sum + p.loss, 0) / points.length
   const avgRetrans = points.reduce((sum, p) => sum + p.retrans, 0) / points.length
@@ -88,13 +203,13 @@ export function calculateNHI(points: MonitorDataPoint[]): number {
   const lossScore = Math.max(0, 100 - avgLoss * 20)
   const retransScore = Math.max(0, 100 - avgRetrans * 10)
 
-  return Math.round((rttScore + lossScore + retransScore) / 3)
+  return +((rttScore + lossScore + retransScore) / 3).toFixed(2)
 }
 
 // Calculate Transaction Health Indicator
 export function calculateTHI(points: MonitorDataPoint[]): number {
   if (!points.length) return 0
-  
+
   const avgSuccessRate = points.reduce((sum, p) => sum + p.successRate, 0) / points.length
   const avgRespP95 = points.reduce((sum, p) => sum + p.respP95, 0) / points.length
   const avgErrorRate = points.reduce((sum, p) => sum + p.errorRate, 0) / points.length
@@ -103,7 +218,7 @@ export function calculateTHI(points: MonitorDataPoint[]): number {
   const respScore = Math.max(0, 100 - (avgRespP95 - 200) * 0.1)
   const errorScore = Math.max(0, 100 - avgErrorRate * 10)
 
-  return Math.round((successScore + respScore + errorScore) / 3)
+  return +((successScore + respScore + errorScore) / 3).toFixed(2)
 }
 
 // Get health indicator color

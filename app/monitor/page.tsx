@@ -2,22 +2,18 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  MonitorIcon,
-  Home,
   Plus,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import MonitorCard, { MonitorCardData } from "@/components/shared/MonitorCard"
+import Sidebar from "@/components/shared/Sidebar"
+import Breadcrumb from "@/components/shared/Breadcrumb"
 
 export default function MonitorListPage() {
   const router = useRouter()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState("Monitor")
 
   // Sample monitor data - in a real app this would come from an API
@@ -30,7 +26,7 @@ export default function MonitorListPage() {
       route: "visa_service",
       type: "network",
       showMetrics: true,
-      iconColor: "blue",
+      iconType: "credit-card",
       statusColor: "green",
     },
     {
@@ -41,8 +37,161 @@ export default function MonitorListPage() {
       route: "visa_service_intermediate",
       type: "transaction",
       showMetrics: true,
-      iconColor: "orange",
+      iconType: "credit-card",
       statusColor: "green",
+    },
+    // UI Layout Test Cards - 8 additional cards for design testing with unique chart types
+    {
+      id: "test-3",
+      name: "[TEST] Payment Gateway Service",
+      status: "active",
+      lastUpdated: "1 minute ago",
+      route: "payment_gateway_test",
+      type: "network",
+      showMetrics: true,
+      iconType: "zap",
+      statusColor: "green",
+      description: "Gradient Area - Traffic Flow",
+      chartType: "gradient-area",
+      dataPattern: "sawtooth",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.8,
+        glow: true
+      }
+    },
+    {
+      id: "test-4",
+      name: "[TEST] Auth Service",
+      status: "warning",
+      lastUpdated: "3 minutes ago",
+      route: "auth_service_test",
+      type: "transaction",
+      showMetrics: true,
+      iconType: "shield",
+      statusColor: "orange",
+      description: "Multi-Line - Performance Metrics",
+      chartType: "multi-line",
+      dataPattern: "heartbeat",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 2,
+        opacity: 0.9
+      }
+    },
+    {
+      id: "test-5",
+      name: "[TEST] Database Monitor",
+      status: "active",
+      lastUpdated: "7 minutes ago",
+      route: "database_test",
+      type: "network",
+      showMetrics: true,
+      iconType: "database",
+      statusColor: "green",
+      description: "Stacked Bar - Resource Usage",
+      chartType: "stacked-bar",
+      dataPattern: "exponential",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        opacity: 0.7
+      }
+    },
+    {
+      id: "test-6",
+      name: "[TEST] API Gateway",
+      status: "error",
+      lastUpdated: "12 minutes ago",
+      route: "api_gateway_test",
+      type: "transaction",
+      showMetrics: true,
+      iconType: "server",
+      statusColor: "red",
+      description: "Bubble Chart - Correlation",
+      chartType: "bubble",
+      dataPattern: "random-walk",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        opacity: 0.6
+      }
+    },
+    {
+      id: "test-7",
+      name: "[TEST] Load Balancer",
+      status: "active",
+      lastUpdated: "4 minutes ago",
+      route: "load_balancer_test",
+      type: "network",
+      showMetrics: true,
+      iconType: "zap",
+      statusColor: "green",
+      description: "Radial Gradient - Load Distribution",
+      chartType: "radial",
+      dataPattern: "logarithmic",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 2,
+        opacity: 0.8
+      }
+    },
+    {
+      id: "test-8",
+      name: "[TEST] Cache Service",
+      status: "warning",
+      lastUpdated: "8 minutes ago",
+      route: "cache_service_test",
+      type: "transaction",
+      showMetrics: true,
+      iconType: "cpu",
+      statusColor: "orange",
+      description: "Waterfall - Cache Performance",
+      chartType: "waterfall",
+      dataPattern: "cascade",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 1,
+        opacity: 0.9
+      }
+    },
+    {
+      id: "test-9",
+      name: "[TEST] Message Queue",
+      status: "active",
+      lastUpdated: "6 minutes ago",
+      route: "message_queue_test",
+      type: "network",
+      showMetrics: true,
+      iconType: "message",
+      statusColor: "green",
+      description: "Candlestick - Queue Metrics",
+      chartType: "candlestick",
+      dataPattern: "oscillating",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.7
+      }
+    },
+    {
+      id: "test-10",
+      name: "[TEST] File Storage",
+      status: "active",
+      lastUpdated: "10 minutes ago",
+      route: "file_storage_test",
+      type: "transaction",
+      showMetrics: true,
+      iconType: "storage",
+      statusColor: "green",
+      description: "Pulse Wave - Storage Bursts",
+      chartType: "pulse-wave",
+      dataPattern: "pulse-burst",
+      // chartColors removed - now using design tokens from chart-colors system
+      chartStyle: {
+        strokeWidth: 3,
+        opacity: 0.9,
+        glow: true
+      }
     },
   ]
 
@@ -61,99 +210,41 @@ export default function MonitorListPage() {
   return (
     <div className="flex h-screen bg-background">
       {/* Left Navigation Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out flex flex-col border-r border-border bg-card`}>
-        {/* Navigation Header */}
-        <div className="p-4 border-b border-border">
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-            {!sidebarCollapsed && (
-              <h2 className="font-semibold text-foreground">Navigation</h2>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="h-8 w-8 p-0"
-              title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Navigation Items */}
-        <div className="flex-1 p-2">
-          <nav className="space-y-2">
-            <Button
-              variant={activeNavItem === "Sentire" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Sentire")}
-              title={sidebarCollapsed ? "Sentire" : undefined}
-            >
-              <Shield className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Sentire</span>}
-            </Button>
-            <Button
-              variant={activeNavItem === "Monitor" ? "default" : "ghost"}
-              className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start px-3'}`}
-              onClick={() => setActiveNavItem("Monitor")}
-              title={sidebarCollapsed ? "Monitor" : undefined}
-            >
-              <MonitorIcon className="h-4 w-4" />
-              {!sidebarCollapsed && <span className="ml-2">Monitor</span>}
-            </Button>
-          </nav>
-        </div>
-      </div>
+      <Sidebar
+        activeNavItem={activeNavItem}
+        onNavItemChange={setActiveNavItem}
+      />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col ml-12 overflow-hidden">
         {/* Top Navigation Bar with Breadcrumb */}
-        <div className="sticky top-0 z-20 bg-card border-b border-border">
-          <div className="px-6 py-3">
-            <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 text-muted-foreground hover:text-foreground"
-                onClick={() => router.push("/")}
-              >
-                <Home className="h-4 w-4" />
-              </Button>
-              <span className="text-muted-foreground">/</span>
-              <span className="text-foreground font-medium">Monitor</span>
-            </nav>
-          </div>
-        </div>
+        <Breadcrumb items={[{ label: "Monitor", isActive: true }]} />
 
         {/* Page Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
+          {/* Monitor Grid */}
+          <div className="monitor-grid-responsive">
+            {/* Existing Monitor Cards */}
+            {monitors.map((monitor) => (
+              <MonitorCard
+                key={monitor.id}
+                monitor={monitor}
+                onClick={handleMonitorClick}
+              />
+            ))}
 
-
-            {/* Monitor Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {/* New Monitor Card */}
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-dashed border-2 border-muted-foreground/30 hover:border-primary/50"
-                onClick={handleCreateNew}
-              >
-                <CardContent className="flex flex-col items-center justify-center h-48 p-6">
-                  <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center mb-4">
-                    <Plus className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="font-medium text-foreground text-center">Create New Monitor</h3>
-                </CardContent>
-              </Card>
-
-              {/* Existing Monitor Cards */}
-              {monitors.map((monitor) => (
-                <MonitorCard
-                  key={monitor.id}
-                  monitor={monitor}
-                  onClick={handleMonitorClick}
-                />
-              ))}
-            </div>
+            {/* New Monitor Card */}
+            <Card
+              className="hover:shadow-lg transition-all duration-200 border-dashed border-2 border-muted-foreground/30 hover:border-primary/50 monitor-card-size"
+              onClick={handleCreateNew}
+            >
+              <CardContent className="flex flex-col items-center justify-center h-full p-4">
+                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center mb-4">
+                  <Plus className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="font-medium text-foreground text-center">Create New Monitor</h3>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
